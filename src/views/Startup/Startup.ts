@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue';
-import { chokidar } from 'chokidar';
+import * as fs from 'fs/promises';
 const regedit = require('regedit').promisified;
 
 export default defineComponent({
@@ -19,6 +19,14 @@ export default defineComponent({
     steamPath(newPath, oldPath) {
       if (newPath !== oldPath) {
         this.libraryfoldersFilePath = newPath + '\\steamapps\\libraryfolders.vdf';
+
+        fs.readFile(this.libraryfoldersFilePath, { encoding: 'utf8' })
+          .then((file) => {
+            const t = file;
+          })
+          .catch((error) => {
+            console.error(`error on open file: `, error);
+          });
       }
     },
   },
