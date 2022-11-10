@@ -1,20 +1,20 @@
-import { rmSync } from "fs";
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import electron from "vite-electron-plugin";
-import { customStart, loadViteEnv } from "vite-electron-plugin/plugin";
-import renderer from "vite-plugin-electron-renderer";
-import pkg from "./package.json";
-import { fileURLToPath, URL } from "node:url";
+import { rmSync } from 'fs';
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import electron from 'vite-electron-plugin';
+import { customStart, loadViteEnv } from 'vite-electron-plugin/plugin';
+import renderer from 'vite-plugin-electron-renderer';
+import pkg from './package.json';
+import { fileURLToPath, URL } from 'node:url';
 
-rmSync("dist-electron", { recursive: true, force: true });
+rmSync('dist-electron', { recursive: true, force: true });
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     electron({
-      include: ["electron"],
+      include: ['electron'],
       transformOptions: {
         sourcemap: !!process.env.VSCODE_DEBUG,
       },
@@ -24,10 +24,8 @@ export default defineConfig({
               // Will start Electron via VSCode Debug
               customStart(
                 debounce(() =>
-                  console.log(
-                    /* For `.vscode/.debug.script.mjs` */ "[startup] Electron App"
-                  )
-                )
+                  console.log(/* For `.vscode/.debug.script.mjs` */ '[startup] Electron App'),
+                ),
               ),
             ]
           : []),
@@ -51,11 +49,11 @@ export default defineConfig({
     : undefined,
   clearScreen: false,
   build: {
-    assetsDir: "", // #287
+    assetsDir: '', // #287
   },
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 });

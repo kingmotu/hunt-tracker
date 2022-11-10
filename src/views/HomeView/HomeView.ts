@@ -1,10 +1,10 @@
-import TheWelcome from "@/components/TheWelcome.vue";
-import { defineComponent } from "vue";
+import TheWelcome from '@/components/TheWelcome.vue';
+import { defineComponent } from 'vue';
 
-const regedit = require("regedit").promisified;
+const regedit = require('regedit').promisified;
 
 export default defineComponent({
-  name: "HomeView",
+  name: 'HomeView',
   components: {
     TheWelcome,
   },
