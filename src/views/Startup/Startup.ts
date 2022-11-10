@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import * as fs from 'fs/promises';
 const regedit = require('regedit').promisified;
 
@@ -10,6 +10,9 @@ export default defineComponent({
     steamPath: '',
     steamActiveUserId: '',
     libraryfoldersFilePath: '',
+    libraryfoldersFile: {},
+    libraryfoldersFileText: '',
+    huntAppsId: '',
   }),
   created() {
     // fetch on init
@@ -22,7 +25,18 @@ export default defineComponent({
 
         fs.readFile(this.libraryfoldersFilePath, { encoding: 'utf8' })
           .then((file) => {
-            const t = file;
+            this.libraryfoldersFile = JSON.parse(
+              `{${file
+                .replaceAll(/"\n(\t)*{/g, '":\n$1{')
+                .replaceAll(/^(\t)*"(.*)"(\t)*"(.*)"\n/gm, '$1"$2": "$4",\n')
+                .replaceAll(/\t/gm, '')
+                .replaceAll(/\n/gm, '')
+                .replace(/([,])(?!.*\1)/, '')}}`,
+            );
+            this.libraryfoldersFileText = this.getFileAsString;
+            this.huntAppsId = (this.libraryfoldersFile as any)['libraryfolders']['0']['apps'][
+              '594650'
+            ];
           })
           .catch((error) => {
             console.error(`error on open file: `, error);
@@ -44,6 +58,11 @@ export default defineComponent({
         console.log(`ActiveUser: ${reg64b[keyPathSteamActiveUser].values.ActiveUser.value}`);
         this.steamActiveUserId = reg64b[keyPathSteamActiveUser].values.ActiveUser.value;
       }
+    },
+  },
+  computed: {
+    getFileAsString() {
+      return JSON.stringify(this.libraryfoldersFile);
     },
   },
 });
