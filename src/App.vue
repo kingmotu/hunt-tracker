@@ -1,18 +1,23 @@
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <v-app :theme="selectedTheme">
+    <v-app-bar color="grey-lighten-2">
+      <RouterLink to="/">Startup</RouterLink>
+      <RouterLink to="/home">Ho<v-icon icon="mdi-home" />me</RouterLink>
+      <RouterLink to="/about">About</RouterLink>
+      <v-spacer></v-spacer>
+      <v-btn
+        :prepend-icon="selectedTheme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+        @click="toggleTheme()"
+        >Toggle Theme</v-btn
+      >
+    </v-app-bar>
+    <!-- <v-navigation-drawer color="grey-darken-2" permanent> </v-navigation-drawer> -->
+    <v-main>
+      <v-container>
+        <RouterView />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script lang="ts" src="./App.ts"></script>
