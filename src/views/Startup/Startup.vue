@@ -6,7 +6,7 @@
           <v-text-field v-model="steamPath" label="Steam path" required></v-text-field>
         </v-col>
 
-        <v-col cols="12">
+        <v-col cols="6">
           <v-text-field
             v-model="steamActiveUserId"
             hint="Only readable if Steam is open"
@@ -15,20 +15,23 @@
           ></v-text-field>
         </v-col>
 
+        <v-col cols="6">
+          <v-text-field v-model="huntAppsId" label="Hunt App Id" readonly></v-text-field>
+        </v-col>
+
         <v-col cols="12">
           <v-text-field
-            v-model="libraryfoldersFilePath"
-            hint="Only readable, generated automatic"
-            label="Path to Steam libraryfolders file"
-            readonly
+            v-model="steamLastUsedGameName"
+            label="Last used game name"
+            required
           ></v-text-field>
         </v-col>
 
         <v-col cols="12">
-          <v-textarea label="Text" v-model="libraryfoldersFileText"> </v-textarea>
+          <v-text-field v-model="huntInstallPath" label="Hunt install path" readonly></v-text-field>
         </v-col>
-        <v-col cols="12" md="4">
-          <v-text-field v-model="huntAppsId" label="Hunt App Id" readonly></v-text-field>
+        <v-col cols="12">
+          <v-btn color="secondary" @click="test()"> TEST </v-btn>
         </v-col>
       </v-row>
     </v-container>

@@ -6,7 +6,12 @@
     "moduleResolution": "Node",
     "jsx": "preserve",
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["package.json", "electron"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "package.json", "electron"],
+  "exclude": ["node_modules"]
 }

@@ -21,6 +21,14 @@ module.exports = {
     quotes: ['error', 'single', { allowTemplateLiterals: true }],
     'vue/multi-word-component-names': 'off',
   },
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['@', './src']],
+        extensions: ['.vue', '.js', '.ts'],
+      },
+    },
+  },
   parserOptions: {
     ecmaVersion: 'latest',
   },
