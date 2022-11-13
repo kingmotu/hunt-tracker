@@ -1,15 +1,18 @@
 import { MissionModel } from '@/models/Mission/MissionModel';
 import { XmlEntrieModel } from '@/models/Xml/XmlEntrieModel';
-import { FSWatcher } from 'chokidar';
-import * as fs from 'fs/promises';
 import { LoggerService } from '.';
 import { MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { MissionPlayerModel } from '@/models/Mission/MissionPlayerModel';
 import { MissionBagEntryModel } from '../models/Mission/MissionBagEntryModel';
 import { MissionAccoladeEntryModel } from '../models/Mission/MissionAccoladeEntryModel';
 
+import { FSWatcher } from 'chokidar';
+import * as fsPromise from 'fs/promises';
+import * as fs from 'fs';
+
 const chokidar = require('chokidar');
 const xml2js = require('xml2js');
+const nodeCrypto = require('crypto');
 
 class AttributesXmlProvider {
   /**
@@ -28,6 +31,7 @@ class AttributesXmlProvider {
   private entries: XmlEntrieModel[][] = [[]];
   private teams: XmlEntrieModel[][] = [[]];
   private mission: XmlEntrieModel[] = [];
+  private lastChecksum: string = '';
 
   /**
    * The Singleton's constructor should always be private to prevent direct
@@ -50,35 +54,44 @@ class AttributesXmlProvider {
     return AttributesXmlProvider.instance;
   }
 
-  // public get SteamPath(): string {
-  //   return this.steamPath;
-  // }
-
   public StartWatchAttributesXml(inPath: string): void {
     if (this.fileWatcher == null) {
       this.fileWatcher = chokidar.watch(inPath, { interval: 2000 });
-      LoggerService.debug(`watcher created`);
+      LoggerService.debug(`watcher created for path: ${inPath}`);
     }
-    LoggerService.debug(`start listening for file change events`);
     this.fileWatcher.on('change', (path, stats) => {
-      if (stats && stats.size > 0) {
-        LoggerService.debug(`read new xml file`);
-        fs.readFile(inPath)
-          .then((fileContent) => {
-            this.parseXmlValues(fileContent);
-          })
-          .catch((error) => {
-            console.error(`error on open file: `, error);
-          });
-      }
+      this.getChecksum(path)
+        .then((checksum) => {
+          LoggerService.debug(
+            `file changed\noldChecksum: ${this.lastChecksum}\nnewChecksum: ${checksum}`,
+            path,
+            stats,
+          );
+          if (checksum !== this.lastChecksum) {
+            this.lastChecksum = checksum;
+            LoggerService.debug(`read new xml file, new checksum: ${this.lastChecksum}`);
+            fsPromise
+              .readFile(inPath)
+              .then((fileContent) => {
+                this.parseXmlValues(fileContent);
+              })
+              .catch((error) => {
+                console.error(`error on open file: `, error);
+              });
+          }
+        })
+        .catch((error) => {
+          LoggerService.error(error);
+        });
     });
+    LoggerService.debug(`start listening for file change events`, this.fileWatcher.getWatched());
   }
 
   public StopWatchAttributesXml(): void {
     if (this.fileWatcher != null) {
       this.fileWatcher
         .close()
-        .then(() => LoggerService.info(`watcher closed`))
+        .then(() => LoggerService.info(`watcher closed: `, this.fileWatcher.getWatched()))
         .catch((error) => LoggerService.error(error));
     } else {
       LoggerService.debug(`no open watcher set`);
@@ -405,6 +418,22 @@ class AttributesXmlProvider {
     });
 
     return accolades;
+  }
+
+  private getChecksum(path: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      // if absolutely necessary, use md5
+      const hash = nodeCrypto.createHash('sha256');
+
+      const input = fs.createReadStream(path);
+      input.on('error', reject);
+      input.on('data', (chunk) => {
+        hash.update(chunk);
+      });
+      input.on('close', () => {
+        resolve(hash.digest('hex'));
+      });
+    });
   }
 }
 

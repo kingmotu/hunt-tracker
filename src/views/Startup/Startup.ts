@@ -25,32 +25,6 @@ export default defineComponent({
       this.steamLastUsedGameName = SteamService.SteamLastUsedGameName;
       this.huntAppsId = SteamService.HuntAppIdHash;
       this.huntInstallPath = SteamService.HuntInstallPath;
-
-      this.fileWatcher = chokidar
-        .watch(SteamService.HuntAttributesXmlPath, {
-          interval: 2000,
-        })
-        .on('change', (path, stats) => {
-          if (stats && stats.size > 0) {
-            LoggerService.debug(`File ${path} changed size to ${stats.size}`);
-
-            fs.readFile(SteamService.HuntAttributesXmlPath, { encoding: 'utf8' })
-              .then((file) => {
-                const parser = new xml2js.Parser();
-                parser
-                  .parseStringPromise(file)
-                  .then((xml) => {
-                    LoggerService.debug(`parsed xml: `, xml);
-                  })
-                  .catch((error) => {
-                    LoggerService.debug(`xml2js error: `, error);
-                  });
-              })
-              .catch((error) => {
-                console.error(`error on open file: `, error);
-              });
-          }
-        });
     });
   },
   watch: {},
