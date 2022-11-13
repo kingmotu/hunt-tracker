@@ -1,28 +1,102 @@
-export interface IHuntUserEventModel {
-  teamId: number;
+export interface IMissionPlayerModel {
+  /**
+   * Internal team player id for mission
+   */
   teamPlayerId: number;
+  /**
+   * Ingame player name used in this mission
+   */
   blood_line_name: string;
+  /**
+   * Number of bounties extraced with
+   */
   bountyextracted: number;
+  /**
+   * Number of bounties picked up
+   */
   bountypickedup: number;
+  /**
+   * Hunter was downed by the tracked player
+   */
   downedbyme: number;
+  /**
+   * Hunter was downed by a teammate of the tracked player
+   */
   downedbyteammate: number;
+  /**
+   * Hunter whas downed the tracked player
+   */
   downedme: number;
+  /**
+   * Hunter downed a teammate of the tracked player
+   */
   downedteammate: number;
+  /**
+   * Hunter had owned the wellspring
+   */
   hadWellspring: boolean;
+  /**
+   * Hunter had a bounty
+   */
   hadbounty: boolean;
+  /**
+   * Is a teammate of the tracked player
+   */
   ispartner: boolean;
+  /**
+   * Hunter is the soul survivor of a QuickPlay
+   */
   issoulsurvivor: boolean;
+  /**
+   * Hunter was killed by the tracked player
+   */
   killedbyme: number;
+  /**
+   * Hunter was killed by a teammate of the tracked player
+   */
   killedbyteammate: number;
+  /**
+   * Hunter had killed the tracked player
+   */
   killedme: number;
+  /**
+   * Hunter had killed a teammate of the tracked player
+   */
   killedteammate: number;
+  /**
+   * MMR of the Hunter
+   */
   mmr: number;
+  /**
+   * Crytek profile id of the Hunter?
+   */
   profileid: number;
+  /**
+   * not known yet
+   * TODO: check what this entrie is for
+   */
   proximity: boolean;
+  /**
+   * not known yet
+   * TODO: check what this entrie is for
+   */
   proximitytome: boolean;
+  /**
+   * not known yet
+   * TODO: check what this entrie is for
+   */
   proximitytoteammate: boolean;
+  /**
+   * Hunter had skillbased matchmaking enabled
+   */
   skillbased: boolean;
+  /**
+   * Team of Hunter extracted together
+   */
   teamextraction: boolean;
+  /**
+   * ?
+   */
   tooltip_downedbyteammate: string;
   tooltipbountyextracted: string;
   tooltipbountypickedup: string;
@@ -35,8 +109,7 @@ export interface IHuntUserEventModel {
   tooltipkilledteammate: string;
 }
 
-export class HuntUserEventModel implements IHuntUserEventModel {
-  public teamId: number;
+export class MissionPlayerModel implements IMissionPlayerModel {
   public teamPlayerId: number;
   public blood_line_name: string;
   public bountyextracted: number;
@@ -72,10 +145,9 @@ export class HuntUserEventModel implements IHuntUserEventModel {
   public tooltipkilledteammate: string;
 
   constructor();
-  constructor(obj: IHuntUserEventModel);
+  constructor(obj: IMissionPlayerModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.teamId = (obj && obj.id) || -1;
     this.teamPlayerId = (obj && obj.subId) || -1;
 
     this.blood_line_name = (obj && obj.blood_line_name) || '';
