@@ -9,6 +9,8 @@ import { MissionAccoladeEntryModel } from '../models/Mission/MissionAccoladeEntr
 import { FSWatcher } from 'chokidar';
 import * as fsPromise from 'fs/promises';
 import * as fs from 'fs';
+import { MissionBagBossesModel } from '../models/Mission/MissionBagBossesModel';
+import { MapTypeEnum } from '@/enums/MapTypeEnum';
 
 const chokidar = require('chokidar');
 const xml2js = require('xml2js');
@@ -31,6 +33,9 @@ class AttributesXmlProvider {
   private entries: XmlEntrieModel[][] = [[]];
   private teams: XmlEntrieModel[][] = [[]];
   private mission: XmlEntrieModel[] = [];
+  private bosses: XmlEntrieModel[] = [];
+  private MissionBagTeamDetailsVersion: number = 0;
+  private PVEModeLastSelected: string = '';
   private lastChecksum: string = '';
 
   /**
@@ -109,11 +114,14 @@ class AttributesXmlProvider {
           this.accolades = [[]];
           this.entries = [[]];
           this.teams = [[]];
+          this.bosses = [];
           this.mission = [];
+          this.MissionBagTeamDetailsVersion = 0;
+          this.PVEModeLastSelected = '';
 
           if (
             xml.Attributes.$.Version &&
-            parseInt(xml.Attributes.$.Version) > this.attributesXmlVersion
+            parseInt(xml.Attributes.$.Version, 10) > this.attributesXmlVersion
           ) {
             // TODO: trigger warning for version missmatch
           }
@@ -195,6 +203,46 @@ class AttributesXmlProvider {
                   LoggerService.error(error);
                   reject(error);
                 }
+              } else if (key?.search(/MissionBagBoss_[0-9]+/) >= 0 && value) {
+                /**
+                 * Parse bosses from xml
+                 */
+                const keyParts = key.split('_');
+                /**
+                 * We need to change this name since
+                 */
+                //keyParts[1] = keyParts[1] === '-1' ? '4' : keyParts[1];
+                const keyName = keyParts.slice(0, keyParts.length).join('_');
+                try {
+                  this.bosses[keyParts[1]] = {
+                    name: keyName === '' ? 'value' : keyName,
+                    value: value,
+                  };
+                } catch (error) {
+                  LoggerService.error(error);
+                  reject(error);
+                }
+              } else if (key?.search(/MissionBagTeamDetailsVersion/) >= 0 && value) {
+                /**
+                 * Parse mission info from xml
+                 */
+                try {
+                  this.MissionBagTeamDetailsVersion = parseInt(value, 10);
+                } catch (error) {
+                  LoggerService.error(error);
+                  reject(error);
+                }
+              } else if (key?.match(/PVEModeLastSelected/) != null && value) {
+                /**
+                 * Parse map info from xml
+                 */
+                try {
+                  const valueParts = (value as string).split('/');
+                  this.PVEModeLastSelected = valueParts[0];
+                } catch (error) {
+                  LoggerService.error(error);
+                  reject(error);
+                }
               } else if (key?.search(/MissionBag(?!(Entry|Player|Boss|Team))/) >= 0 && value) {
                 /**
                  * Parse mission info from xml
@@ -255,13 +303,19 @@ class AttributesXmlProvider {
         }
 
         /**
-         * Check for Bounty or QuickPlay
+         * Get bosses
          */
-        if (this.lastMissionLog.MissionBagIsQuickPlay === true) {
-          // If we have a qucik play game, each team has only one player
-        } else {
-          // normal bounty game
-        }
+        this.lastMissionLog.Bosses = this.getBosses(this.bosses);
+
+        /**
+         * Get team details version
+         */
+        this.lastMissionLog.MissionBagTeamDetailsVersion = this.MissionBagTeamDetailsVersion;
+
+        /**
+         * Get map typ
+         */
+        this.lastMissionLog.PVEModeLastSelected = this.getMapType(this.PVEModeLastSelected);
 
         /**
          * Set teams by slice the number of teams
@@ -418,6 +472,52 @@ class AttributesXmlProvider {
     });
 
     return accolades;
+  }
+
+  private getBosses(inBosses: XmlEntrieModel[]): MissionBagBossesModel {
+    const newBosses = new MissionBagBossesModel();
+
+    for (const key in newBosses) {
+      if (Object.prototype.hasOwnProperty.call(newBosses, key)) {
+        const item = inBosses.find((item) => item.name === key);
+        if (item && item.value) {
+          switch (typeof newBosses[key]) {
+            case 'boolean':
+              newBosses[key] = item.value === 'true' ? true : false;
+              break;
+            case 'number':
+              newBosses[key] = parseInt(item.value, 10);
+              break;
+            default:
+              newBosses[key] = item.value;
+              break;
+          }
+        }
+      }
+    }
+
+    return newBosses;
+  }
+
+  private getMapType(inMapType: string): MapTypeEnum {
+    let mapType = MapTypeEnum.Unknown;
+
+    switch (inMapType) {
+      case 'civilwar':
+        mapType = MapTypeEnum.Lawson_Delta;
+        break;
+      case 'cemetery':
+        mapType = MapTypeEnum.Stillwater_Bayou;
+        break;
+      case 'creek':
+        mapType = MapTypeEnum.DeSalle;
+        break;
+
+      default:
+        break;
+    }
+
+    return mapType;
   }
 
   private getChecksum(path: string): Promise<any> {

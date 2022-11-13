@@ -1,6 +1,8 @@
 import { IMissionAccoladeEntryModel, MissionAccoladeEntryModel } from './MissionAccoladeEntryModel';
 import { IMissionBagEntryModel, MissionBagEntryModel } from './MissionBagEntryModel';
 import { IMissionTeamModel, MissionTeamModel } from './MissionTeamModel';
+import { MissionBagBossesModel } from './MissionBagBossesModel';
+import { MapTypeEnum } from '@/enums/MapTypeEnum';
 
 export interface IMissionModel {
   Id: string;
@@ -12,6 +14,20 @@ export interface IMissionModel {
   MissionBagNumAccolades: number;
   MissionBagNumEntries: number;
   MissionBagNumTeams: number;
+
+  /**
+   * Model with infos which boss(es) are in
+   * the mission
+   */
+  Bosses: MissionBagBossesModel;
+  /**
+   * Version of team details?
+   */
+  MissionBagTeamDetailsVersion: number;
+  /**
+   * Map type name as enum
+   */
+  PVEModeLastSelected: MapTypeEnum;
 
   Accolades: IMissionAccoladeEntryModel[];
   Entries: IMissionBagEntryModel[];
@@ -28,6 +44,10 @@ export class MissionModel implements IMissionModel {
   public MissionBagNumAccolades: number;
   public MissionBagNumEntries: number;
   public MissionBagNumTeams: number;
+
+  public Bosses: MissionBagBossesModel;
+  public MissionBagTeamDetailsVersion: number;
+  public PVEModeLastSelected: MapTypeEnum;
 
   public Accolades: MissionAccoladeEntryModel[];
   public Entries: MissionBagEntryModel[];
@@ -47,6 +67,11 @@ export class MissionModel implements IMissionModel {
     this.MissionBagNumAccolades = (obj && obj.MissionBagNumAccolades) || 0;
     this.MissionBagNumEntries = (obj && obj.MissionBagNumEntries) || 0;
     this.MissionBagNumTeams = (obj && obj.MissionBagNumTeams) || 0;
+
+    this.Bosses =
+      obj && obj.Bosses ? new MissionBagBossesModel(obj.Bosses) : new MissionBagBossesModel();
+    this.MissionBagTeamDetailsVersion = (obj && obj.MissionBagTeamDetailsVersion) || 0;
+    this.PVEModeLastSelected = (obj && obj.PVEModeLastSelected) || MapTypeEnum.Unknown;
 
     this.Accolades = [];
     this.Entries = [];
