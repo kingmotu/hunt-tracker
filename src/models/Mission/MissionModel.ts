@@ -2,8 +2,8 @@ import { IMissionAccoladeEntryModel, MissionAccoladeEntryModel } from './Mission
 import { IMissionBagEntryModel, MissionBagEntryModel } from './MissionBagEntryModel';
 import { IMissionTeamModel, MissionTeamModel } from './MissionTeamModel';
 
-export interface IHuntUserEventModel {
-  Id: number;
+export interface IMissionModel {
+  Id: string;
   MissionBagFbeGoldBonus: number;
   MissionBagFbeHunterXpBonus: number;
   MissionBagIsFbeBonusEnabled: boolean;
@@ -18,8 +18,8 @@ export interface IHuntUserEventModel {
   Teams: IMissionTeamModel[];
 }
 
-export class HuntUserEventModel implements IHuntUserEventModel {
-  public Id: number;
+export class MissionModel implements IMissionModel {
+  public Id: string;
   public MissionBagFbeGoldBonus: number;
   public MissionBagFbeHunterXpBonus: number;
   public MissionBagIsFbeBonusEnabled: boolean;
@@ -34,10 +34,10 @@ export class HuntUserEventModel implements IHuntUserEventModel {
   public Teams: MissionTeamModel[];
 
   constructor();
-  constructor(obj: IHuntUserEventModel);
+  constructor(obj: IMissionModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.Id = (obj && obj.id) || -1;
+    this.Id = (obj && obj.id) || '';
     this.MissionBagFbeGoldBonus = (obj && obj.MissionBagFbeGoldBonus) || 0;
 
     this.MissionBagFbeHunterXpBonus = (obj && obj.MissionBagFbeHunterXpBonus) || 0;

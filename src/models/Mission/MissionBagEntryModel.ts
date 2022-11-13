@@ -1,5 +1,5 @@
 export interface IMissionBagEntryModel {
-  eventId: number;
+  entryId: number;
   value: number;
   amount: number;
   category: string;
@@ -29,7 +29,7 @@ export interface IMissionBagEntryModel {
 }
 
 export class MissionBagEntryModel implements IMissionBagEntryModel {
-  public eventId: number;
+  public entryId: number;
   public value: number;
   public amount: number;
   public category: string;
@@ -48,7 +48,7 @@ export class MissionBagEntryModel implements IMissionBagEntryModel {
   constructor(obj: IMissionBagEntryModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.eventId = (obj && obj.eventId) || -1;
+    this.entryId = (obj && obj.entryId) || -1;
     this.value = (obj && obj.value) || -1;
 
     this.amount = (obj && obj.bloodlineXp) || 0;

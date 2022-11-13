@@ -221,38 +221,6 @@ class SteamProvider {
         });
     });
   }
-
-  private getLastPlayerNameUsedInSteam(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const huntManifestFilePath =
-        this.steamPath + `\\steamapps\\appmanifest_${this.huntAppId}.acf`;
-
-      fs.readFile(huntManifestFilePath, { encoding: 'utf8' })
-        .then((file) => {
-          const huntManifestFile = JSON.parse(
-            `{${file
-              .replaceAll(/"\n(\t)*{/g, '":\n$1{')
-              .replaceAll(/^(\t)*"(.*)"(\t)*"(.*)"\n/gm, '$1"$2": "$4",\n')
-              .replaceAll(/}\n(\t*)"/gm, '},\n$1"')
-              .replaceAll(/,\n(\t*)}/gm, '\n$1}')
-              .replaceAll(/\t/gm, '')
-              .replaceAll(/\n/gm, '')}}`,
-          );
-          LoggerService.debug(`huntManifestFile: `, huntManifestFile);
-          try {
-            const installDir = (huntManifestFile as any)['AppState']['installdir'];
-            this.huntInstallPath = this.SteamPath + `\\steamapps\\common\\${installDir}`;
-            resolve();
-          } catch (error) {
-            LoggerService.debug(`readHuntManifest error: `, error);
-            reject(error);
-          }
-        })
-        .catch((error) => {
-          console.error(`error on open file: `, error);
-        });
-    });
-  }
 }
 
 export default SteamProvider;

@@ -55,6 +55,7 @@ export class MissionTeamModel implements IMissionTeamModel {
   // eslint-disable-next-line
   constructor(obj?: any) {
     this.teamId = (obj && obj.id) || -1;
+    this.value = (obj && obj.value) || 0;
     this.handicap = (obj && obj.handicap) || 0;
     this.isinvite = (obj && obj.isinvite) || false;
     this.mmr = (obj && obj.mmr) || 0;

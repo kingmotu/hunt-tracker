@@ -1,5 +1,5 @@
 export interface IMissionAccoladeEntryModel {
-  eventId: number;
+  accoladeId: number;
   value: number;
   bloodlineXp: number;
   bounty: number;
@@ -18,7 +18,7 @@ export interface IMissionAccoladeEntryModel {
 }
 
 export class MissionAccoladeEntryModel implements IMissionAccoladeEntryModel {
-  public eventId: number;
+  public accoladeId: number;
   public value: number;
   public bloodlineXp: number;
   public bounty: number;
@@ -39,7 +39,7 @@ export class MissionAccoladeEntryModel implements IMissionAccoladeEntryModel {
   constructor(obj: IMissionAccoladeEntryModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.eventId = (obj && obj.eventId) || -1;
+    this.accoladeId = (obj && obj.accoladeId) || -1;
     this.value = (obj && obj.value) || -1;
 
     this.bloodlineXp = (obj && obj.bloodlineXp) || 0;

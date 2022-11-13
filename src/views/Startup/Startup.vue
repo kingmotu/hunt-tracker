@@ -30,8 +30,14 @@
         <v-col cols="12">
           <v-text-field v-model="huntInstallPath" label="Hunt install path" readonly></v-text-field>
         </v-col>
-        <v-col cols="12">
+        <v-col cols="4">
           <v-btn color="secondary" @click="test()"> TEST </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn color="secondary" @click="startWatchAttribuesXml()"> Start </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn color="secondary" @click="stopWatchAttribuesXml()"> Stop </v-btn>
         </v-col>
       </v-row>
     </v-container>
