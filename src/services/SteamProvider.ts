@@ -1,6 +1,8 @@
 import * as fs from 'fs/promises';
+import path from 'path';
 import { LoggerService } from '.';
-const regedit = require('regedit').promisified;
+const regedit = require('regedit');
+const regeditPromisified = require('regedit').promisified;
 
 class SteamProvider {
   /**
@@ -9,7 +11,7 @@ class SteamProvider {
   private static instance: SteamProvider;
 
   private steamPath: string = '';
-  private steamActiveUserId: string = '';
+  private steamActiveUserId: number = 0;
   private steamLastUsedGameName: string = '';
 
   private readonly huntAppId = '594650';
@@ -21,7 +23,18 @@ class SteamProvider {
    * construction calls with the `new` operator.
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
+  private constructor() {
+    // //regedit.setExternalVBSLocation('/public/vbs');
+    // // Assuming the files lie in <app>/resources/my-location
+    // if (import.meta.env.PROD) {
+    //   // const vbsDirectory = path.join(path.dirname(app.getPath('exe')), './resources/vbs');
+    //   const vbsDirectory = path.join(path.dirname(__dirname), 'extraResources', 'vbs');
+    //   regedit.setExternalVBSLocation(vbsDirectory);
+    // } else {
+    //   regedit.setExternalVBSLocation('/extraRessources/vbs');
+    // }
+    // this.SetLibPath();
+  }
 
   /**
    * The static method that controls the access to the singleton instance.
@@ -41,7 +54,7 @@ class SteamProvider {
     return this.steamPath;
   }
 
-  public get SteamActiveUserId(): string {
+  public get SteamActiveUserId(): number {
     return this.steamActiveUserId;
   }
 
@@ -65,8 +78,21 @@ class SteamProvider {
     return `${this.HuntInstallPath}\\user\\profiles\\default\\attributes.xml`;
   }
 
+  public SetLibPath(): void {
+    // if (import.meta.env.PROD) {
+    // const vbsDirectory = path.join(path.dirname(app.getPath('exe')), './resources/vbs');
+    // const vbsDirectory = path.join(path.dirname(__dirname), 'extraResources', 'vbs');
+    // LoggerService.info(`new vbsDirectory: ${vbsDirectory}`);
+    // regedit.setExternalVBSLocation(vbsDirectory);
+    regedit.setExternalVBSLocation('resources/regedit/vbs');
+    // } else {
+    //   regedit.setExternalVBSLocation('/extraRessources/vbs');
+    // }
+  }
+
   public ReadSteamInfos(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      this.SetLibPath();
       /**
        * First read steam infos from registry
        */
@@ -101,7 +127,7 @@ class SteamProvider {
       const keyPathSteamActiveUser = `HKCU\\SOFTWARE\\Valve\\Steam\\ActiveProcess`;
       const keyPathSteamLastUsername = `HKCU\\SOFTWARE\\Valve\\Steam`;
 
-      regedit
+      regeditPromisified
         .list([keyPathSteam, keyPathSteam64])
         .then((regListPaths: any) => {
           if (regListPaths[keyPathSteam64]) {
@@ -112,19 +138,19 @@ class SteamProvider {
             reject(`could not find Steam installation`);
           }
 
-          regedit
+          regeditPromisified
             .list(keyPathSteamActiveUser)
             .then((regListActiveUser: any) => {
               if (regListActiveUser[keyPathSteamActiveUser]) {
                 this.steamActiveUserId =
                   regListActiveUser[keyPathSteamActiveUser].values.ActiveUser.value;
-                if (this.steamActiveUserId === '0') {
+                if (this.steamActiveUserId === 0) {
                   LoggerService.debug(`It seems Steam is not running since ActiveUseId is zero.`);
                 }
               } else {
                 reject(`Could not find active user in registry`);
               }
-              regedit
+              regeditPromisified
                 .list(keyPathSteamLastUsername)
                 .then((regListLastUserName: any) => {
                   if (regListLastUserName[keyPathSteamLastUsername]) {
@@ -168,7 +194,6 @@ class SteamProvider {
               .replaceAll(/\t/gm, '')
               .replaceAll(/\n/gm, '')}}`,
           );
-          LoggerService.debug(`libraryfoldersFile: `, JSON.stringify(libraryfoldersFile));
           let appKeys: string[] | undefined = undefined;
           try {
             appKeys = Object.keys((libraryfoldersFile as any)['libraryfolders']['0']['apps']);
@@ -178,7 +203,7 @@ class SteamProvider {
               ];
               resolve();
             } else {
-              reject('Hunt: SHowdown seems not to be installed on your device');
+              reject('Hunt: Showdown seems not to be installed on your device');
             }
           } catch (error) {
             reject('Error on parsing steam apps');
@@ -206,7 +231,6 @@ class SteamProvider {
               .replaceAll(/\t/gm, '')
               .replaceAll(/\n/gm, '')}}`,
           );
-          LoggerService.debug(`huntManifestFile: `, huntManifestFile);
           try {
             const installDir = (huntManifestFile as any)['AppState']['installdir'];
             this.huntInstallPath = this.SteamPath + `\\steamapps\\common\\${installDir}`;

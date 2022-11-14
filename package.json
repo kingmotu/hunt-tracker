@@ -17,6 +17,15 @@
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
   },
+  "extraResources": [
+    {
+      "from": "node_modules/regedit/vbs",
+      "to": "regedit/vbs",
+      "filter": [
+        "**/*"
+      ]
+    }
+  ],
   "dependencies": {
     "chokidar": "^3.5.3",
     "eslint-import-resolver-typescript": "^3.5.2",

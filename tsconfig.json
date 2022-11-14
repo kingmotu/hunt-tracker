@@ -14,8 +14,6 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+  "include": ["vite.config.*"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

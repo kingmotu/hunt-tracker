@@ -1,9 +1,6 @@
 import { defineComponent } from 'vue';
-import { SteamService, LoggerService, AttributesXmlService } from '@/services/index';
+import { SteamService, AttributesXmlService, LoggerService } from '@/services/index';
 import * as fs from 'fs/promises';
-
-const chokidar = require('chokidar');
-const xml2js = require('xml2js');
 
 export default defineComponent({
   name: 'Startup',
@@ -19,13 +16,15 @@ export default defineComponent({
   }),
   created() {
     // fetch on init
-    SteamService.ReadSteamInfos().then(() => {
-      this.steamPath = SteamService.SteamPath;
-      this.steamActiveUserId = SteamService.SteamActiveUserId;
-      this.steamLastUsedGameName = SteamService.SteamLastUsedGameName;
-      this.huntAppsId = SteamService.HuntAppIdHash;
-      this.huntInstallPath = SteamService.HuntInstallPath;
-    });
+    SteamService.ReadSteamInfos()
+      .catch((error) => LoggerService.error(error))
+      .finally(() => {
+        this.steamPath = SteamService.SteamPath;
+        this.steamActiveUserId = SteamService.SteamActiveUserId;
+        this.steamLastUsedGameName = SteamService.SteamLastUsedGameName;
+        this.huntAppsId = SteamService.HuntAppIdHash;
+        this.huntInstallPath = SteamService.HuntInstallPath;
+      });
   },
   watch: {},
   methods: {
@@ -36,7 +35,11 @@ export default defineComponent({
       AttributesXmlService.StopWatchAttributesXml();
     },
     test() {
-      fs.readFile(SteamService.HuntAttributesXmlPath)
+      // fs.readFile('src/mock/attributes_BH_Solo.xml')
+      SteamService.SetLibPath();
+      fs.readFile(
+        'C:\\Users\\sko\\Documents\\git\\privat\\hunt-tracker\\src\\mock\\attributes_QP.xml',
+      )
         .then((file) => {
           AttributesXmlService.parseXmlValues(file);
         })
