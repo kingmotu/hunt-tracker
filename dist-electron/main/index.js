@@ -64,6 +64,8 @@ import_electron.app.on("activate", () => {
 });
 import_electron.ipcMain.handle("open-win", (event, arg) => {
   const childWindow = new import_electron.BrowserWindow({
+    width: 1440,
+    height: 800,
     webPreferences: {
       preload,
       nodeIntegration: true,

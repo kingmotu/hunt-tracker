@@ -1,5 +1,10 @@
 import { defineComponent } from 'vue';
-import { SteamService, AttributesXmlService, LoggerService } from '@/services/index';
+import {
+  SteamService,
+  AttributesXmlService,
+  LoggerService,
+  ProfileService,
+} from '@/services/index';
 import * as fs from 'fs/promises';
 
 export default defineComponent({
@@ -13,9 +18,22 @@ export default defineComponent({
     huntAppsId: '',
     huntInstallPath: '',
     fileWatcher: null,
+    panel: [0],
+    profileDisabled: true,
   }),
-  created() {
-    // fetch on init
+  created() {},
+  mounted() {
+    if (ProfileService.LastUsedProfileUuid != null) {
+      ProfileService.FetchUserProfile(ProfileService.LastUsedProfileUuid)
+        .then((profile) => {
+          LoggerService.debug(`profile fetched: `, profile);
+        })
+        .catch((error) => {
+          LoggerService.error(error);
+        });
+    } else {
+      LoggerService.debug(`no profile uuid found, create new profile`);
+    }
   },
   watch: {},
   methods: {

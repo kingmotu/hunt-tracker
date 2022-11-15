@@ -102,6 +102,8 @@ app.on('activate', () => {
 // new window example arg: new windows url
 ipcMain.handle('open-win', (event, arg) => {
   const childWindow = new BrowserWindow({
+    width: 1440,
+    height: 800,
     webPreferences: {
       preload,
       nodeIntegration: true,

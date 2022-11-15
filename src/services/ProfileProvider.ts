@@ -1,4 +1,3 @@
-import { LoggerService } from '@/services/index';
 import { DexieProfileModel } from '@/models/Dexie/DexieProfileModel';
 import DexieDB from './DexieDB';
 import DexieDBProvider from './DexieDBProvider';
@@ -48,8 +47,8 @@ class ProfileProvider {
   }
 
   /**
-   * Add a new DataSet
-   * @param profile DataSet
+   * Add a new Profile
+   * @param profile Profile
    */
   public async AddProfileProvider(profile: DexieProfileModel): Promise<number> {
     return this.dexieDB.add<DexieProfileModel>(this.dexieDB!.getTables().profiles, profile);
@@ -63,8 +62,40 @@ class ProfileProvider {
     return this.dexieDB.put<DexieProfileModel>(this.dexieDB!.getTables().profiles, profile);
   }
 
+  /**
+   * Put/Update a Profile
+   * @param dataSet Profile
+   */
+  public async bulkPutProfile(profiles: DexieProfileModel[]): Promise<number> {
+    return this.dexieDB.bulkPut<DexieProfileModel>(this.dexieDB!.getTables().profiles, profiles);
+  }
+
+  /**
+   * Delete an Profile
+   * @param profile Profile
+   */
+  public async DeleteProfile(profile: DexieProfileModel): Promise<void> {
+    return this.dexieDB.del<DexieProfileModel>(this.dexieDB!.getTables().profiles, profile.id);
+  }
+
+  public get LastUsedProfileUuid(): string {
+    return this.lastUsedProfileUuid;
+  }
+
   public FetchUserProfile(profileUuid: string): Promise<DexieProfileModel> {
-    return new Promise<DexieProfileModel>((resolve, reject) => {});
+    return new Promise<DexieProfileModel>((resolve, reject) => {
+      this.GetAllProfilesFromDexieDB()
+        .then((profiles) => {
+          const profile = profiles.find((p) => p.uuid === profileUuid);
+          if (profile) {
+            this.userProfile = profile;
+            resolve(profile);
+          } else {
+            reject(`could not find user profile with uuid: ${profileUuid}`);
+          }
+        })
+        .catch((error) => reject(error));
+    });
   }
 }
 
