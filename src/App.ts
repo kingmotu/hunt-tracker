@@ -17,6 +17,8 @@ export default defineComponent({
   },
   data: () => ({
     selectedTheme: ref('light'),
+    drawer: ref(true),
+    rail: ref(false),
   }),
   methods: {
     toggleTheme() {
@@ -28,5 +30,9 @@ export default defineComponent({
       return this.selectedTheme;
     },
   },
-  watch: {},
+  watch: {
+    drawer(newDrawer, oldDrawer) {
+      LoggerService.debug(newDrawer, oldDrawer);
+    },
+  },
 });

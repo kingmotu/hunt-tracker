@@ -232,7 +232,7 @@ class AttributesXmlProvider {
                   LoggerService.error(error);
                   reject(error);
                 }
-              } else if (key?.match(/PVEModeLastSelected/) != null && value) {
+              } else if (key?.match(/PVEModeLastSelected(?!(\/))/) != null && value) {
                 /**
                  * Parse map info from xml
                  */
