@@ -30,9 +30,5 @@ export default defineComponent({
       return this.selectedTheme;
     },
   },
-  watch: {
-    drawer(newDrawer, oldDrawer) {
-      LoggerService.debug(newDrawer, oldDrawer);
-    },
-  },
+  watch: {},
 });

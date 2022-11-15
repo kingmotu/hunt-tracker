@@ -16,11 +16,7 @@
       <v-list>
         <v-list-item prepend-avatar="test" title="username" subtitle="last nick name" nav>
           <template v-slot:append>
-            <v-btn
-              variant="text"
-              :icon="!rail ? 'mdi-chevron-left' : 'mdi-chevron-right'"
-              @click.stop="rail = !rail"
-            ></v-btn>
+            <v-btn variant="text" :icon="'mdi-chevron-left'" @click.stop="rail = !rail"></v-btn>
           </template>
         </v-list-item>
       </v-list>
@@ -28,10 +24,20 @@
       <v-divider></v-divider>
 
       <v-list density="compact" nav>
-        <v-list-item prepend-icon="mdi-cog" title="Setup" value="setup"> </v-list-item>
-        <v-list-item prepend-icon="mdi-play-circle-outline" title="Tracking" value="tracking">
+        <v-list-item prepend-icon="mdi-cog" title="Setup" value="setup" to="/"> </v-list-item>
+        <v-list-item
+          prepend-icon="mdi-play-circle-outline"
+          title="Tracking"
+          value="tracking"
+          to="/home"
+        >
         </v-list-item>
-        <v-list-item prepend-icon="mdi-chart-line" title="Statistics" value="statistics">
+        <v-list-item
+          prepend-icon="mdi-chart-line"
+          title="Statistics"
+          value="statistics"
+          to="/about"
+        >
         </v-list-item>
       </v-list>
       <template v-slot:append>
