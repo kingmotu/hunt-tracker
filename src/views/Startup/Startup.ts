@@ -16,15 +16,6 @@ export default defineComponent({
   }),
   created() {
     // fetch on init
-    SteamService.ReadSteamInfos()
-      .catch((error) => LoggerService.error(error))
-      .finally(() => {
-        this.steamPath = SteamService.SteamPath;
-        this.steamActiveUserId = SteamService.SteamActiveUserId;
-        this.steamLastUsedGameName = SteamService.SteamLastUsedGameName;
-        this.huntAppsId = SteamService.HuntAppIdHash;
-        this.huntInstallPath = SteamService.HuntInstallPath;
-      });
   },
   watch: {},
   methods: {
@@ -33,6 +24,19 @@ export default defineComponent({
     },
     stopWatchAttribuesXml() {
       AttributesXmlService.StopWatchAttributesXml();
+    },
+    readSteamInfos() {
+      SteamService.ReadSteamInfos()
+        .catch((error) => {
+          LoggerService.error(`Error on fetching Steaminfos: `, error);
+        })
+        .finally(() => {
+          this.steamPath = SteamService.SteamPath;
+          this.steamActiveUserId = SteamService.SteamActiveUserId;
+          this.steamLastUsedGameName = SteamService.SteamLastUsedGameName;
+          this.huntAppsId = SteamService.HuntAppIdHash;
+          this.huntInstallPath = SteamService.HuntInstallPath;
+        });
     },
     test() {
       // fs.readFile('src/mock/attributes_BH_Solo.xml')

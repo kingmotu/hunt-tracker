@@ -1,5 +1,4 @@
 import * as fs from 'fs/promises';
-import path from 'path';
 import { LoggerService } from '.';
 const regedit = require('regedit');
 const regeditPromisified = require('regedit').promisified;
@@ -24,16 +23,7 @@ class SteamProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {
-    // //regedit.setExternalVBSLocation('/public/vbs');
-    // // Assuming the files lie in <app>/resources/my-location
-    // if (import.meta.env.PROD) {
-    //   // const vbsDirectory = path.join(path.dirname(app.getPath('exe')), './resources/vbs');
-    //   const vbsDirectory = path.join(path.dirname(__dirname), 'extraResources', 'vbs');
-    //   regedit.setExternalVBSLocation(vbsDirectory);
-    // } else {
-    //   regedit.setExternalVBSLocation('/extraRessources/vbs');
-    // }
-    // this.SetLibPath();
+    this.SetLibPath();
   }
 
   /**
@@ -79,20 +69,13 @@ class SteamProvider {
   }
 
   public SetLibPath(): void {
-    // if (import.meta.env.PROD) {
-    // const vbsDirectory = path.join(path.dirname(app.getPath('exe')), './resources/vbs');
-    // const vbsDirectory = path.join(path.dirname(__dirname), 'extraResources', 'vbs');
-    // LoggerService.info(`new vbsDirectory: ${vbsDirectory}`);
-    // regedit.setExternalVBSLocation(vbsDirectory);
-    regedit.setExternalVBSLocation('resources/regedit/vbs');
-    // } else {
-    //   regedit.setExternalVBSLocation('/extraRessources/vbs');
-    // }
+    if (import.meta.env.PROD) {
+      regedit.setExternalVBSLocation('resources/regedit/vbs');
+    }
   }
 
   public ReadSteamInfos(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.SetLibPath();
       /**
        * First read steam infos from registry
        */
