@@ -278,7 +278,7 @@ class AttributesXmlProvider {
     return new Promise<void>((resolve, reject) => {
       try {
         this.lastMissionLog = new MissionModel();
-        this.lastMissionLog.Id = crypto ? crypto.randomUUID() : new Date().toISOString();
+        this.lastMissionLog.uuid = crypto ? crypto.randomUUID() : new Date().toISOString();
         /**
          * Set mission settings
          */
