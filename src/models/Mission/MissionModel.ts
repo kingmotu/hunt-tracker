@@ -5,7 +5,7 @@ import { MissionBagBossesModel } from './MissionBagBossesModel';
 import { MapTypeEnum } from '@/enums/MapTypeEnum';
 
 export interface IMissionModel {
-  Id: string;
+  uuid: string;
   MissionBagFbeGoldBonus: number;
   MissionBagFbeHunterXpBonus: number;
   MissionBagIsFbeBonusEnabled: boolean;
@@ -35,7 +35,7 @@ export interface IMissionModel {
 }
 
 export class MissionModel implements IMissionModel {
-  public Id: string;
+  public uuid: string;
   public MissionBagFbeGoldBonus: number;
   public MissionBagFbeHunterXpBonus: number;
   public MissionBagIsFbeBonusEnabled: boolean;
@@ -57,7 +57,7 @@ export class MissionModel implements IMissionModel {
   constructor(obj: IMissionModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.Id = (obj && obj.id) || '';
+    this.uuid = (obj && obj.id) || '';
     this.MissionBagFbeGoldBonus = (obj && obj.MissionBagFbeGoldBonus) || 0;
 
     this.MissionBagFbeHunterXpBonus = (obj && obj.MissionBagFbeHunterXpBonus) || 0;
