@@ -9,9 +9,10 @@
         <v-col cols="6">
           <v-text-field
             v-model="steamActiveUserId"
-            hint="Only readable if Steam is open"
+            hint="Only readable if Steam is running"
             label="Active Steam User Id"
             required
+            persistent-hint
           ></v-text-field>
         </v-col>
 
@@ -28,15 +29,23 @@
         </v-col>
 
         <v-col cols="12">
-          <v-text-field v-model="huntInstallPath" label="Hunt install path" readonly></v-text-field>
+          <v-text-field
+            v-model="huntInstallPath"
+            label="Hunt install path"
+            readonly
+            persistent-hint
+          ></v-text-field>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-btn color="secondary" @click="test()"> TEST </v-btn>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
+          <v-btn color="secondary" @click="readSteamInfos()"> Steam </v-btn>
+        </v-col>
+        <v-col cols="3">
           <v-btn color="secondary" @click="startWatchAttribuesXml()"> Start </v-btn>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="3">
           <v-btn color="secondary" @click="stopWatchAttribuesXml()"> Stop </v-btn>
         </v-col>
       </v-row>

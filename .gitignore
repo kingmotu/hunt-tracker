@@ -27,3 +27,5 @@ coverage
 *.sln
 *.sw?
 dist-electron
+/src/mock/
+/release
