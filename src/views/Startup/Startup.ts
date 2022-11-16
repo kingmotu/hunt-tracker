@@ -41,13 +41,12 @@ export default defineComponent({
         .then((settings) => {
           LoggerService.debug(`settings fetched: `, settings);
           this.steamPath = settings.steamPath;
-          this.steamActiveUserId = settings.steamUserId;
-          this.steamUserName = settings.steamUserName;
-          this.steamLastUsedGameName = settings.steamProfileName;
           this.huntAppsId = settings.huntAppsId;
           this.huntAttributesXmlPath = settings.huntAttriburesXmlPath;
 
           this.settingsChanged = false;
+          this.profileDisabled = false;
+          this.panel = ['profile'];
         })
         .catch((error) => {
           LoggerService.error(error);
@@ -59,6 +58,12 @@ export default defineComponent({
       ProfileService.FetchUserProfile(ProfileService.LastUsedProfileUuid)
         .then((profile) => {
           LoggerService.debug(`profile fetched: `, profile);
+          this.steamActiveUserId = profile.steamUserId;
+          this.steamUserName = profile.steamUserName;
+          this.steamLastUsedGameName = profile.steamProfileName;
+          this.huntProfileId = profile.huntProfileId;
+
+          this.profileChanged = false;
         })
         .catch((error) => {
           LoggerService.error(error);
@@ -69,12 +74,6 @@ export default defineComponent({
   },
   watch: {},
   methods: {
-    startWatchAttribuesXml() {
-      AttributesXmlService.StartWatchAttributesXml(SteamService.HuntAttributesXmlPath);
-    },
-    stopWatchAttribuesXml() {
-      AttributesXmlService.StopWatchAttributesXml();
-    },
     readSteamInfos() {
       SteamService.ReadSteamInfos()
         .catch((error) => {
@@ -96,7 +95,7 @@ export default defineComponent({
           if (lastMission) {
             for (let index = 0; index < lastMission.Teams.length; index++) {
               const team = lastMission.Teams[index];
-              const player = team.palyers.find(
+              const player = team.players.find(
                 (player) => player.blood_line_name === this.steamLastUsedGameName,
               );
               if (player) {
@@ -123,12 +122,9 @@ export default defineComponent({
               ? SettingsService.LastUsedSettingsUuid
               : crypto.randomUUID(),
           steamPath: SteamService.SteamPath,
-          steamUserName: SteamService.SteamUserName,
-          steamProfileName: SteamService.SteamLastUsedGameName,
           huntAppsId: parseInt(SteamService.HuntAppId, 10),
           huntPath: SteamService.HuntInstallPath,
           huntAttriburesXmlPath: SteamService.HuntAttributesXmlPath,
-          steamUserId: SteamService.SteamActiveUserId,
         });
         if (
           SettingsService.LastUsedSettingsUuid == null ||
@@ -140,6 +136,7 @@ export default defineComponent({
             })
             .catch((error) => {
               LoggerService.error(error);
+              return;
             });
         }
         this.panel = ['profile'];
@@ -153,25 +150,35 @@ export default defineComponent({
         this.validProfile = valid;
         this.profile = new DexieProfileModel({
           settingsUuid: SettingsService.LastUsedSettingsUuid,
-          steamLastGameName: SteamService.SteamLastUsedGameName,
-          steamLoginName: SteamService.SteamUserName,
+          steamProfileName: SteamService.SteamLastUsedGameName,
+          steamUserName: SteamService.SteamUserName,
           uuid: ProfileService.LastUsedProfileUuid
             ? ProfileService.LastUsedProfileUuid
             : crypto.randomUUID(),
-          steamId: SteamService.SteamActiveUserId,
+          steamUserId: SteamService.SteamActiveUserId,
           huntProfileId: this.huntProfileId,
         });
-        ProfileService.SaveProfile(this.profile)
-          .then((response) => {
-            LoggerService.debug(`Save profile with id: ${response}`);
-          })
-          .catch((error) => {
-            LoggerService.error(error);
-          });
+
+        if (
+          ProfileService.LastUsedProfileUuid == null ||
+          (ProfileService.LastUsedProfileUuid != null && this.profileChanged === true)
+        ) {
+          ProfileService.SaveProfile(this.profile)
+            .then((response) => {
+              LoggerService.debug(`Save profile with id: ${response}`);
+            })
+            .catch((error) => {
+              LoggerService.error(error);
+              return;
+            });
+        }
       }
     },
     onSettingsChanged() {
       this.settingsChanged = true;
+    },
+    onProfileChanged() {
+      this.profileChanged = true;
     },
     test() {
       AttributesXmlService.ReadXmlFile(SteamService.HuntAttributesXmlPath).catch((error) => {

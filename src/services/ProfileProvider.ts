@@ -78,6 +78,18 @@ class ProfileProvider {
     return this.dexieDB.del<DexieProfileModel>(this.dexieDB!.getTables().profiles, profile.id);
   }
 
+  /**
+   * Delete an Profile
+   * @param profile Profile
+   */
+  public async UpdateProfile(profile: DexieProfileModel): Promise<number> {
+    return this.dexieDB.update<DexieProfileModel>(
+      this.dexieDB!.getTables().profiles,
+      profile.id,
+      profile,
+    );
+  }
+
   public get LastUsedProfileUuid(): string {
     return this.lastUsedProfileUuid;
   }
@@ -105,12 +117,35 @@ class ProfileProvider {
     });
   }
 
-  public SaveProfile(profile: DexieProfileModel): Promise<number> {
+  public SaveProfile(inProfile: DexieProfileModel): Promise<number> {
     return new Promise<number>((resolve, reject) => {
-      this.PutProfile(profile)
-        .then((response) => {
-          this.LastUsedProfileUuid = profile.uuid;
-          resolve(response);
+      this.GetAllProfilesFromDexieDB()
+        .then((profiles) => {
+          const oldProfile = profiles.find((p) => p.uuid === inProfile.uuid);
+          if (oldProfile) {
+            oldProfile.avatar = inProfile.avatar;
+            oldProfile.huntProfileId = inProfile.huntProfileId;
+            oldProfile.steamProfileName = inProfile.steamProfileName;
+            oldProfile.steamUserId = inProfile.steamUserId;
+            oldProfile.steamUserName = inProfile.steamUserName;
+            this.UpdateProfile(oldProfile)
+              .then((response) => {
+                this.LastUsedProfileUuid = oldProfile.uuid;
+                resolve(response);
+              })
+              .then((error) => {
+                reject(error);
+              });
+          } else {
+            this.PutProfile(inProfile)
+              .then((response) => {
+                this.LastUsedProfileUuid = inProfile.uuid;
+                resolve(response);
+              })
+              .then((error) => {
+                reject(error);
+              });
+          }
         })
         .then((error) => {
           reject(error);

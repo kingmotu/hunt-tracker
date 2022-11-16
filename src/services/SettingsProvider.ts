@@ -107,12 +107,23 @@ class SettingsProvider {
 
   public SaveSettings(settigns: DexieSettingsModel): Promise<number> {
     return new Promise<number>((resolve, reject) => {
-      this.PutSettings(settigns)
-        .then((response) => {
-          this.LastUsedSettingsUuid = settigns.uuid;
-          resolve(response);
+      this.GetAllSettingsFromDexieDB()
+        .then((allSettings) => {
+          const oldSettings = allSettings.find((s) => s.uuid === settigns.uuid);
+          if (oldSettings) {
+            settigns.id = oldSettings.id;
+          }
+
+          this.PutSettings(settigns)
+            .then((response) => {
+              this.LastUsedSettingsUuid = settigns.uuid;
+              resolve(response);
+            })
+            .then((error) => {
+              reject(error);
+            });
         })
-        .then((error) => {
+        .catch((error) => {
           reject(error);
         });
     });

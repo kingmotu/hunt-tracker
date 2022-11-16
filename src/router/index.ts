@@ -25,6 +25,14 @@ const router = createRouter({
       component: () => import('@/views/AboutView.vue'),
     },
     {
+      path: '/statistic',
+      name: 'statistic',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('@/views/StatisticView/StatisticView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)',
       name: 'bad-not-found',
       redirect: '/',

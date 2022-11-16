@@ -15,6 +15,8 @@ export interface IMissionModel {
   MissionBagNumEntries: number;
   MissionBagNumTeams: number;
 
+  dateTime: Date;
+
   /**
    * Model with infos which boss(es) are in
    * the mission
@@ -49,6 +51,8 @@ export class MissionModel implements IMissionModel {
   public MissionBagTeamDetailsVersion: number;
   public PVEModeLastSelected: MapTypeEnum;
 
+  public dateTime: Date;
+
   public Accolades: MissionAccoladeEntryModel[];
   public Entries: MissionBagEntryModel[];
   public Teams: MissionTeamModel[];
@@ -67,6 +71,8 @@ export class MissionModel implements IMissionModel {
     this.MissionBagNumAccolades = (obj && obj.MissionBagNumAccolades) || 0;
     this.MissionBagNumEntries = (obj && obj.MissionBagNumEntries) || 0;
     this.MissionBagNumTeams = (obj && obj.MissionBagNumTeams) || 0;
+
+    this.dateTime = (obj && obj.dateTime) || new Date();
 
     this.Bosses =
       obj && obj.Bosses ? new MissionBagBossesModel(obj.Bosses) : new MissionBagBossesModel();

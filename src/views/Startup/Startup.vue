@@ -53,7 +53,7 @@
                     hint="Optional, only readable if Steam is running"
                     label="Active Steam User Id"
                     persistent-hint
-                    @change="onSettingsChanged"
+                    @change="onProfileChanged"
                   ></v-text-field>
                 </v-col>
 
@@ -69,7 +69,7 @@
                     :rules="nameRules"
                     persistent-hint
                     required
-                    @change="onSettingsChanged"
+                    @change="onProfileChanged"
                   ></v-text-field>
                 </v-col>
 
@@ -81,7 +81,7 @@
                     :rules="nameRules"
                     persistent-hint
                     required
-                    @change="onSettingsChanged"
+                    @change="onProfileChanged"
                   ></v-text-field>
                 </v-col>
 
@@ -93,7 +93,7 @@
                     :rules="nameRules"
                     persistent-hint
                     required
-                    @change="onSettingsChanged"
+                    @change="onProfileChanged"
                   ></v-text-field>
                 </v-col>
 

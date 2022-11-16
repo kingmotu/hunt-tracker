@@ -35,7 +35,7 @@ export interface IMissionTeamModel {
    * A list of players for this team.
    * In QuickPlay each team has one player
    */
-  palyers: IMissionPlayerModel[];
+  players: IMissionPlayerModel[];
 }
 
 export class MissionTeamModel implements IMissionTeamModel {
@@ -48,7 +48,7 @@ export class MissionTeamModel implements IMissionTeamModel {
   public numplayers: number;
   public ownteam: boolean;
 
-  public palyers: MissionPlayerModel[];
+  public players: MissionPlayerModel[];
 
   constructor();
   constructor(obj: IMissionTeamModel);
@@ -62,11 +62,11 @@ export class MissionTeamModel implements IMissionTeamModel {
     this.numplayers = (obj && obj.numplayers) || 0;
     this.ownteam = (obj && obj.ownteam) || false;
 
-    this.palyers = [];
+    this.players = [];
 
     if (obj && obj.players) {
       obj.players.forEach((player) => {
-        this.palyers.push(new MissionPlayerModel(player));
+        this.players.push(new MissionPlayerModel(player));
       });
     }
   }

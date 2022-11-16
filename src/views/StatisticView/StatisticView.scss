@@ -1,0 +1,41 @@
+.statistic-view {
+  .mission {
+    display: flex;
+    flex-direction: column;
+    .team {
+      display: flex;
+      flex-direction: column;
+      padding: 5px;
+      margin-bottom: 10px;
+
+      border-left: 1px solid red;
+
+      &.own-team {
+        border-left: 1px solid green;
+      }
+      &__details {
+        padding: 5px;
+        display: flex;
+        .name {
+          padding: 0 5px;
+          font-weight: bold;
+        }
+        .mmr {
+          padding: 0 5px;
+        }
+      }
+
+      &__player {
+        padding: 5px;
+        display: flex;
+        .name {
+          padding: 0 5px;
+          font-weight: bold;
+        }
+        .mmr {
+          padding: 0 5px;
+        }
+      }
+    }
+  }
+}

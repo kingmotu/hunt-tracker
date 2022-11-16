@@ -29,7 +29,7 @@
           prepend-icon="mdi-play-circle-outline"
           title="Tracking"
           value="tracking"
-          to="/home"
+          to="/statistic"
         >
         </v-list-item>
         <v-list-item

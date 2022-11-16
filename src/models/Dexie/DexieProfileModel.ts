@@ -2,9 +2,9 @@ import { DexieBaseModel, IDexieBaseModel } from './DexieBaseModel';
 
 export interface IDexieProfileModel extends IDexieBaseModel {
   uuid: string;
-  steamId?: number;
-  steamLoginName: string;
-  steamLastGameName: string;
+  steamUserId?: number;
+  steamUserName: string;
+  steamProfileName: string;
   huntProfileId?: number;
   settingsUuid: string;
   avatar?: string;
@@ -12,9 +12,9 @@ export interface IDexieProfileModel extends IDexieBaseModel {
 
 export class DexieProfileModel extends DexieBaseModel implements IDexieProfileModel {
   public uuid: string;
-  public steamId?: number;
-  public steamLoginName: string;
-  public steamLastGameName: string;
+  public steamUserId?: number;
+  public steamUserName: string;
+  public steamProfileName: string;
   public huntProfileId?: number;
   public settingsUuid: string;
   public avatar?: string;
@@ -24,9 +24,9 @@ export class DexieProfileModel extends DexieBaseModel implements IDexieProfileMo
   constructor(obj?: any) {
     super(obj);
     this.uuid = (obj && obj.uuid) || '';
-    this.steamId = obj && obj.steamId ? obj.steamId : undefined;
-    this.steamLoginName = (obj && obj.steamLoginName) || '';
-    this.steamLastGameName = (obj && obj.steamLastGameName) || '';
+    this.steamUserId = obj && obj.steamUserId ? obj.steamUserId : undefined;
+    this.steamUserName = (obj && obj.steamUserName) || '';
+    this.steamProfileName = (obj && obj.steamProfileName) || '';
     this.huntProfileId = obj && obj.huntProfileId ? obj.huntProfileId : undefined;
     this.settingsUuid = (obj && obj.settingsUuid) || '';
     this.avatar = obj && obj.avatar ? obj.avatar : 'default';

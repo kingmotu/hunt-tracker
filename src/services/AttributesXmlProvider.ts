@@ -11,6 +11,7 @@ import * as fsPromise from 'fs/promises';
 import * as fs from 'fs';
 import { MissionBagBossesModel } from '../models/Mission/MissionBagBossesModel';
 import { MapTypeEnum } from '@/enums/MapTypeEnum';
+import { ILiteEvent, LiteEvent } from '../liteEvent/liteEvent';
 
 const chokidar = require('chokidar');
 const xml2js = require('xml2js');
@@ -23,6 +24,8 @@ class AttributesXmlProvider {
   private static instance: AttributesXmlProvider;
 
   private readonly attributesXmlVersion: number = 37;
+
+  private readonly onAttributesXmlChanged = new LiteEvent<MissionModel>();
 
   private fileWatcher: FSWatcher = null;
 
@@ -63,6 +66,10 @@ class AttributesXmlProvider {
     return this.lastMissionLog;
   }
 
+  public get OnAttributesXmlChanged(): ILiteEvent<MissionModel> {
+    return this.onAttributesXmlChanged.expose();
+  }
+
   public StartWatchAttributesXml(inPath: string): void {
     if (this.fileWatcher == null) {
       this.fileWatcher = chokidar.watch(inPath, { interval: 2000 });
@@ -82,6 +89,7 @@ class AttributesXmlProvider {
             this.ReadXmlFile(path)
               .then(() => {
                 LoggerService.debug(`xml file opened and parsed`);
+                this.onAttributesXmlChanged.trigger(this.LastMissionLog);
               })
               .catch((error) => {
                 LoggerService.error(`error on open/parse file: `, error);
@@ -299,8 +307,10 @@ class AttributesXmlProvider {
   private createModelsFromParsedData(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       try {
+        const now = new Date();
         this.lastMissionLog = new MissionModel();
-        this.lastMissionLog.uuid = crypto ? crypto.randomUUID() : new Date().toISOString();
+        this.lastMissionLog.uuid = crypto ? crypto.randomUUID() : now.toISOString();
+        this.lastMissionLog.dateTime = now;
         /**
          * Set mission settings
          */
@@ -407,7 +417,7 @@ class AttributesXmlProvider {
 
   private setTeamPlayers(inTeams: MissionTeamModel[], inPlayers: XmlEntrieModel[][][]): void {
     inTeams.forEach((team, teamIndex) => {
-      team.palyers = [];
+      team.players = [];
       for (let playerIndex = 0; playerIndex < team.numplayers; playerIndex++) {
         const playerModel = new MissionPlayerModel();
         const player = inPlayers[teamIndex][playerIndex];
@@ -431,7 +441,7 @@ class AttributesXmlProvider {
             }
           }
         }
-        team.palyers.push(playerModel);
+        team.players.push(playerModel);
       }
     });
   }

@@ -26,9 +26,9 @@ class DexieDB extends Dexie {
      */
 
     this.version(1).stores({
-      profiles: '++id, uuid',
-      missions: '++id, uuid',
-      settings: '++id, uuid',
+      profiles: '++id,uuid',
+      missions: '++id,uuid',
+      settings: '++id,uuid',
     });
 
     // The following line is needed if your typescript
@@ -52,7 +52,14 @@ class DexieDB extends Dexie {
 
     return new Promise((resolve, reject) => {
       if (tableRef !== undefined) {
-        resolve(tableRef.add(data));
+        tableRef
+          .add(data)
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         reject(`Cant find table ${tableName} in DexieDB to put data`);
       }
@@ -71,7 +78,14 @@ class DexieDB extends Dexie {
 
     return new Promise((resolve, reject) => {
       if (tableRef !== undefined) {
-        resolve(tableRef.put(data));
+        tableRef
+          .put(data)
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         reject(`Cant find table ${tableName} in DexieDB to put data`);
       }
@@ -91,7 +105,14 @@ class DexieDB extends Dexie {
         reject(`data must be an array`);
       }
       if (tableRef !== undefined) {
-        resolve(tableRef.bulkPut(data));
+        tableRef
+          .bulkPut(data)
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         reject(`Cant find table ${tableName} in DexieDB to put data`);
       }
@@ -108,7 +129,14 @@ class DexieDB extends Dexie {
 
     return new Promise((resolve, reject) => {
       if (tableRef !== undefined && key != null) {
-        resolve(tableRef.delete(key));
+        tableRef
+          .delete(key)
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         reject(`Cant find table ${tableName} in DexieDB to delete data with id: ${key}`);
       }
@@ -124,7 +152,14 @@ class DexieDB extends Dexie {
 
     return new Promise((resolve, reject) => {
       if (tableRef !== undefined) {
-        resolve(tableRef.clear());
+        tableRef
+          .clear()
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         reject(`Cant find table ${tableName} in DexieDB to clear data`);
       }
@@ -132,17 +167,24 @@ class DexieDB extends Dexie {
   }
 
   /**
-   * Add or Update a data object into a table
+   * Update a data object into a table
    * @param tableName     Name of the table
    * @param key           Key of the entrie
    * @param data          The json ojbject with the data to store
    */
-  public update(tableName: string, key: number, data: object): Promise<number> {
-    const descriptor = Object.getOwnPropertyDescriptor(this, tableName);
+  public update<T>(tableName: string, key: number, data: object): Promise<number> {
+    const tableRef = this.getTableRef<T>(tableName);
 
-    return new Promise((resolve, reject) => {
-      if (descriptor !== undefined && descriptor.value.put) {
-        resolve(descriptor.value.update(data));
+    return new Promise<number>((resolve, reject) => {
+      if (tableRef !== undefined) {
+        tableRef
+          .update(key, data)
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       } else {
         reject(`Cant find table ${tableName} in DexieDB to update data`);
       }
