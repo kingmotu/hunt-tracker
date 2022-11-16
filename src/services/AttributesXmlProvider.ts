@@ -59,6 +59,10 @@ class AttributesXmlProvider {
     return AttributesXmlProvider.instance;
   }
 
+  public get LastMissionLog(): MissionModel | undefined {
+    return this.lastMissionLog;
+  }
+
   public StartWatchAttributesXml(inPath: string): void {
     if (this.fileWatcher == null) {
       this.fileWatcher = chokidar.watch(inPath, { interval: 2000 });
@@ -75,13 +79,12 @@ class AttributesXmlProvider {
           if (checksum !== this.lastChecksum) {
             this.lastChecksum = checksum;
             LoggerService.debug(`read new xml file, new checksum: ${this.lastChecksum}`);
-            fsPromise
-              .readFile(inPath)
-              .then((fileContent) => {
-                this.parseXmlValues(fileContent);
+            this.ReadXmlFile(path)
+              .then(() => {
+                LoggerService.debug(`xml file opened and parsed`);
               })
               .catch((error) => {
-                console.error(`error on open file: `, error);
+                LoggerService.error(`error on open/parse file: `, error);
               });
           }
         })
@@ -103,7 +106,26 @@ class AttributesXmlProvider {
     }
   }
 
-  public parseXmlValues(inFileContent: Buffer): Promise<void> {
+  public ReadXmlFile(inPath: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      fsPromise
+        .readFile(inPath)
+        .then((fileContent) => {
+          this.parseXmlValues(fileContent)
+            .then(() => {
+              resolve();
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  private parseXmlValues(inFileContent: Buffer): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const parser = new xml2js.Parser();
       parser

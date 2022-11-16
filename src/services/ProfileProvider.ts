@@ -58,7 +58,7 @@ class ProfileProvider {
    * Put/Update a ProfileProvider
    * @param profile ProfileProvider
    */
-  public async PutProfileProvider(profile: DexieProfileModel): Promise<number> {
+  public async PutProfile(profile: DexieProfileModel): Promise<number> {
     return this.dexieDB.put<DexieProfileModel>(this.dexieDB!.getTables().profiles, profile);
   }
 
@@ -82,6 +82,13 @@ class ProfileProvider {
     return this.lastUsedProfileUuid;
   }
 
+  public set LastUsedProfileUuid(profileUuid: string) {
+    if (localStorage) {
+      localStorage.setItem(profileKey, profileUuid);
+      this.lastUsedProfileUuid = profileUuid;
+    }
+  }
+
   public FetchUserProfile(profileUuid: string): Promise<DexieProfileModel> {
     return new Promise<DexieProfileModel>((resolve, reject) => {
       this.GetAllProfilesFromDexieDB()
@@ -95,6 +102,19 @@ class ProfileProvider {
           }
         })
         .catch((error) => reject(error));
+    });
+  }
+
+  public SaveProfile(profile: DexieProfileModel): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      this.PutProfile(profile)
+        .then((response) => {
+          this.LastUsedProfileUuid = profile.uuid;
+          resolve(response);
+        })
+        .then((error) => {
+          reject(error);
+        });
     });
   }
 }

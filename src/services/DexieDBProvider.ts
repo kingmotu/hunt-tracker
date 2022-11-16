@@ -13,7 +13,7 @@ class DexieDBProvider {
    * construction calls with the `new` operator.
    */
   private constructor() {
-    this.dexieDB = new DexieDB('mytab_tables');
+    this.dexieDB = new DexieDB('hunt_tracker_tables');
   }
 
   /**

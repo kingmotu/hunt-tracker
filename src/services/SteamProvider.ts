@@ -10,7 +10,8 @@ class SteamProvider {
   private static instance: SteamProvider;
 
   private steamPath: string = '';
-  private steamActiveUserId: number = 0;
+  private steamActiveUserId: number | undefined = undefined;
+  private steamUserName: string = '';
   private steamLastUsedGameName: string = '';
 
   private readonly huntAppId = '594650';
@@ -44,8 +45,12 @@ class SteamProvider {
     return this.steamPath;
   }
 
-  public get SteamActiveUserId(): number {
+  public get SteamActiveUserId(): number | undefined {
     return this.steamActiveUserId;
+  }
+
+  public get SteamUserName(): string {
+    return this.steamUserName;
   }
 
   public get SteamLastUsedGameName(): string {
@@ -82,20 +87,29 @@ class SteamProvider {
       this.getSteamInfos()
         .then(() => {
           /**
-           * Second check if Hunt is installed
+           * Second check logged in steam user
            */
-          this.readLibraryFolders()
+          this.readSteamLoginusers()
             .then(() => {
               /**
-               * Read Hunt manifest file to get Hunt path
+               * Third check if Hunt is installed
                */
-              this.readHuntManifest()
+              this.readLibraryFolders()
                 .then(() => {
-                  resolve();
+                  /**
+                   * Read Hunt manifest file to get Hunt path
+                   */
+                  this.readHuntManifest()
+                    .then(() => {
+                      resolve();
+                    })
+                    .catch((error) => reject(error));
                 })
                 .catch((error) => reject(error));
             })
-            .catch((error) => reject(error));
+            .catch((error) => {
+              reject(error);
+            });
         })
         .catch((error) => {
           reject(error);
@@ -140,12 +154,14 @@ class SteamProvider {
                     if (regListLastUserName[keyPathSteamLastUsername].values.LastGameNameUsed) {
                       this.steamLastUsedGameName =
                         regListLastUserName[keyPathSteamLastUsername].values.LastGameNameUsed.value;
-                    } else if (regListLastUserName[keyPathSteamLastUsername].values.AutoLoginUser) {
-                      this.steamLastUsedGameName =
+                    }
+                    if (regListLastUserName[keyPathSteamLastUsername].values.AutoLoginUser) {
+                      this.steamUserName =
                         regListLastUserName[keyPathSteamLastUsername].values.AutoLoginUser.value;
                     } else {
-                      reject(`Could not find last used game/user name`);
+                      reject(`Could not find last user name`);
                     }
+
                     resolve(true);
                   } else {
                     reject(`Could not find last used username in registry`);
@@ -226,6 +242,52 @@ class SteamProvider {
         .catch((error) => {
           console.error(`error on open file: `, error);
         });
+    });
+  }
+
+  private readSteamLoginusers(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.steamLastUsedGameName !== '') {
+        LoggerService.debug(`steamLastUsedGameName already set: ${this.steamLastUsedGameName}`);
+        resolve();
+      } else {
+        LoggerService.debug(`try to read steamLastUsedGameName from loginusers.vdf`);
+        const steamLoginusersPath = this.steamPath + `\\config\\loginusers.vdf`;
+
+        fs.readFile(steamLoginusersPath, { encoding: 'utf8' })
+          .then((file) => {
+            const steamLoginusers = JSON.parse(
+              `{${file
+                .replaceAll(/"\n(\t)*{/g, '":\n$1{')
+                .replaceAll(/^(\t)*"(.*)"(\t)*"(.*)"\n/gm, '$1"$2": "$4",\n')
+                .replaceAll(/}\n(\t*)"/gm, '},\n$1"')
+                .replaceAll(/,\n(\t*)}/gm, '\n$1}')
+                .replaceAll(/\t/gm, '')
+                .replaceAll(/\n/gm, '')}}`,
+            );
+            try {
+              const userIds = Object.keys((steamLoginusers as any)['users']);
+              for (let index = 0; index < userIds.length; index++) {
+                const userId = userIds[index];
+                if (
+                  (steamLoginusers as any)['users'][userId]['AccountName'] === this.SteamUserName ||
+                  (steamLoginusers as any)['users'][userId]['mostrecent'] === '1'
+                ) {
+                  this.steamLastUsedGameName = (steamLoginusers as any)['users'][userId][
+                    'PersonaName'
+                  ];
+                }
+              }
+              resolve();
+            } catch (error) {
+              LoggerService.debug(`readHuntManifest error: `, error);
+              reject(error);
+            }
+          })
+          .catch((error) => {
+            console.error(`error on open file: `, error);
+          });
+      }
     });
   }
 }

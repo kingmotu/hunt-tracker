@@ -7,7 +7,7 @@ export interface IDexieProfileModel extends IDexieBaseModel {
   steamLastGameName: string;
   huntProfileId?: number;
   settingsUuid: string;
-  avatar: string;
+  avatar?: string;
 }
 
 export class DexieProfileModel extends DexieBaseModel implements IDexieProfileModel {
@@ -17,7 +17,7 @@ export class DexieProfileModel extends DexieBaseModel implements IDexieProfileMo
   public steamLastGameName: string;
   public huntProfileId?: number;
   public settingsUuid: string;
-  public avatar: string;
+  public avatar?: string;
 
   constructor();
   constructor(obj: IDexieProfileModel);
@@ -29,6 +29,6 @@ export class DexieProfileModel extends DexieBaseModel implements IDexieProfileMo
     this.steamLastGameName = (obj && obj.steamLastGameName) || '';
     this.huntProfileId = obj && obj.huntProfileId ? obj.huntProfileId : undefined;
     this.settingsUuid = (obj && obj.settingsUuid) || '';
-    this.avatar = (obj && obj.avatar) || 'default';
+    this.avatar = obj && obj.avatar ? obj.avatar : 'default';
   }
 }
