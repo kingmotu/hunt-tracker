@@ -37,39 +37,50 @@ export default defineComponent({
   created() {},
   mounted() {
     if (SettingsService.LastUsedSettingsUuid != null) {
-      SettingsService.FetchSettings(SettingsService.LastUsedSettingsUuid)
-        .then((settings) => {
-          LoggerService.debug(`settings fetched: `, settings);
-          this.steamPath = settings.steamPath;
-          this.huntAppsId = settings.huntAppsId;
-          this.huntAttributesXmlPath = settings.huntAttriburesXmlPath;
+      const setSettings = (settings) => {
+        LoggerService.debug(`settings fetched: `, settings);
+        this.steamPath = settings.steamPath;
+        this.huntAppsId = settings.huntAppsId;
+        this.huntAttributesXmlPath = settings.huntAttriburesXmlPath;
 
-          this.settingsChanged = false;
-          this.profileDisabled = false;
-          this.panel = ['profile'];
-        })
-        .catch((error) => {
-          LoggerService.error(error);
-        });
-    } else {
-      LoggerService.debug(`no settings uuid found, create new settings`);
+        this.settingsChanged = false;
+        this.profileDisabled = false;
+        this.panel = ['profile'];
+      };
+      if (SettingsService.Settings != null) {
+        setSettings(SettingsService.Settings);
+      } else {
+        SettingsService.FetchSettings(SettingsService.LastUsedSettingsUuid)
+          .then((settings) => {
+            setSettings(settings);
+          })
+          .catch((error) => {
+            LoggerService.error(error);
+          });
+      }
     }
-    if (ProfileService.LastUsedProfileUuid != null) {
-      ProfileService.FetchUserProfile(ProfileService.LastUsedProfileUuid)
-        .then((profile) => {
-          LoggerService.debug(`profile fetched: `, profile);
-          this.steamActiveUserId = profile.steamUserId;
-          this.steamUserName = profile.steamUserName;
-          this.steamLastUsedGameName = profile.steamProfileName;
-          this.huntProfileId = profile.huntProfileId;
 
-          this.profileChanged = false;
-        })
-        .catch((error) => {
-          LoggerService.error(error);
-        });
-    } else {
-      LoggerService.debug(`no profile uuid found, create new profile`);
+    if (ProfileService.LastUsedProfileUuid != null) {
+      const setProfile = (profile) => {
+        LoggerService.debug(`profile fetched: `, profile);
+        this.steamActiveUserId = profile.steamUserId;
+        this.steamUserName = profile.steamUserName;
+        this.steamLastUsedGameName = profile.steamProfileName;
+        this.huntProfileId = profile.huntProfileId;
+
+        this.profileChanged = false;
+      };
+      if (ProfileService.UserProfile != null) {
+        setProfile(ProfileService.UserProfile);
+      } else {
+        ProfileService.FetchUserProfile(ProfileService.LastUsedProfileUuid)
+          .then((profile) => {
+            setProfile(profile);
+          })
+          .catch((error) => {
+            LoggerService.error(error);
+          });
+      }
     }
   },
   watch: {},
@@ -157,6 +168,7 @@ export default defineComponent({
             : crypto.randomUUID(),
           steamUserId: SteamService.SteamActiveUserId,
           huntProfileId: this.huntProfileId,
+          hasMissionInit: false,
         });
 
         if (

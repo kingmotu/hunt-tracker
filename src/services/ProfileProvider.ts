@@ -1,3 +1,4 @@
+import { ILiteEvent, LiteEvent } from '@/liteEvent/liteEvent';
 import { DexieProfileModel } from '@/models/Dexie/DexieProfileModel';
 import DexieDB from './DexieDB';
 import DexieDBProvider from './DexieDBProvider';
@@ -14,6 +15,8 @@ class ProfileProvider {
   private userProfile: DexieProfileModel | undefined = undefined;
 
   private dexieDB: DexieDB = DexieDBProvider.getInstance().dexieDB;
+
+  private onProfileChanged = new LiteEvent<DexieProfileModel>();
 
   /**
    * The Singleton's constructor should always be private to prevent direct
@@ -90,14 +93,26 @@ class ProfileProvider {
     );
   }
 
-  public get LastUsedProfileUuid(): string {
+  public get LastUsedProfileUuid(): string | undefined {
     return this.lastUsedProfileUuid;
+  }
+
+  public get UserProfile(): DexieProfileModel | undefined {
+    return this.userProfile;
+  }
+
+  public get OnProfileChanged(): ILiteEvent<DexieProfileModel> {
+    return this.onProfileChanged.expose();
   }
 
   public set LastUsedProfileUuid(profileUuid: string) {
     if (localStorage) {
       localStorage.setItem(profileKey, profileUuid);
       this.lastUsedProfileUuid = profileUuid;
+      this.FetchUserProfile(profileUuid).then((profile) => {
+        this.userProfile = profile;
+        this.onProfileChanged.trigger(profile);
+      });
     }
   }
 
@@ -133,7 +148,7 @@ class ProfileProvider {
                 this.LastUsedProfileUuid = oldProfile.uuid;
                 resolve(response);
               })
-              .then((error) => {
+              .catch((error) => {
                 reject(error);
               });
           } else {
@@ -142,12 +157,12 @@ class ProfileProvider {
                 this.LastUsedProfileUuid = inProfile.uuid;
                 resolve(response);
               })
-              .then((error) => {
+              .catch((error) => {
                 reject(error);
               });
           }
         })
-        .then((error) => {
+        .catch((error) => {
           reject(error);
         });
     });

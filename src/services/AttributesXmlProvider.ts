@@ -86,7 +86,7 @@ class AttributesXmlProvider {
           if (checksum !== this.lastChecksum) {
             this.lastChecksum = checksum;
             LoggerService.debug(`read new xml file, new checksum: ${this.lastChecksum}`);
-            this.ReadXmlFile(path)
+            this.ReadXmlFile(path, checksum)
               .then(() => {
                 LoggerService.debug(`xml file opened and parsed`);
                 this.onAttributesXmlChanged.trigger(this.LastMissionLog);
@@ -114,18 +114,31 @@ class AttributesXmlProvider {
     }
   }
 
-  public ReadXmlFile(inPath: string): Promise<void> {
+  public ReadXmlFile(inPath: string, inCheckSum?: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      fsPromise
-        .readFile(inPath)
-        .then((fileContent) => {
-          this.parseXmlValues(fileContent)
-            .then(() => {
-              resolve();
-            })
-            .catch((error) => {
-              reject(error);
-            });
+      const readFile = (inPath: string, checkSum?: string) => {
+        fsPromise
+          .readFile(inPath)
+          .then((fileContent) => {
+            this.parseXmlValues(fileContent, checkSum)
+              .then(() => {
+                resolve();
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      };
+
+      if (inCheckSum) {
+        readFile(inPath, inCheckSum);
+      }
+      this.getChecksum(inPath)
+        .then((checksum) => {
+          readFile(inPath, checksum);
         })
         .catch((error) => {
           reject(error);
@@ -133,7 +146,7 @@ class AttributesXmlProvider {
     });
   }
 
-  private parseXmlValues(inFileContent: Buffer): Promise<void> {
+  private parseXmlValues(inFileContent: Buffer, inCheckSum: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const parser = new xml2js.Parser();
       parser
@@ -290,7 +303,7 @@ class AttributesXmlProvider {
             reject(`XML file seems to not contain any events`);
           }
 
-          this.createModelsFromParsedData()
+          this.createModelsFromParsedData(inCheckSum)
             .then(() => {
               LoggerService.debug('MissionModel: ', this.lastMissionLog);
               resolve();
@@ -304,13 +317,14 @@ class AttributesXmlProvider {
     });
   }
 
-  private createModelsFromParsedData(): Promise<void> {
+  private createModelsFromParsedData(inCheckSum: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       try {
         const now = new Date();
         this.lastMissionLog = new MissionModel();
         this.lastMissionLog.uuid = crypto ? crypto.randomUUID() : now.toISOString();
-        this.lastMissionLog.dateTime = now;
+        this.lastMissionLog.MissionFinishedDateTime = now;
+        this.lastMissionLog.xmlChecksum = inCheckSum;
         /**
          * Set mission settings
          */

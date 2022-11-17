@@ -1,6 +1,7 @@
 import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
 import DexieDB from './DexieDB';
 import DexieDBProvider from './DexieDBProvider';
+import { LiteEvent, ILiteEvent } from '../liteEvent/liteEvent';
 
 const settingsKey: string = 'ht_settings_uuid';
 
@@ -14,6 +15,8 @@ class SettingsProvider {
   private settings: DexieSettingsModel | undefined = undefined;
 
   private dexieDB: DexieDB = DexieDBProvider.getInstance().dexieDB;
+
+  private onSettingsChanged = new LiteEvent<DexieSettingsModel>();
 
   /**
    * The Singleton's constructor should always be private to prevent direct
@@ -82,10 +85,22 @@ class SettingsProvider {
     return this.lastUsedSettingsUuid;
   }
 
+  public get Settings(): DexieSettingsModel | undefined {
+    return this.settings;
+  }
+
+  public get OnSettingsChanged(): ILiteEvent<DexieSettingsModel> {
+    return this.onSettingsChanged.expose();
+  }
+
   public set LastUsedSettingsUuid(settingsUuid: string) {
     if (localStorage) {
       localStorage.setItem(settingsKey, settingsUuid);
       this.lastUsedSettingsUuid = settingsUuid;
+      this.FetchSettings(settingsUuid).then((settings) => {
+        this.settings = settings;
+        this.onSettingsChanged.trigger(settings);
+      });
     }
   }
 
@@ -119,7 +134,7 @@ class SettingsProvider {
               this.LastUsedSettingsUuid = settigns.uuid;
               resolve(response);
             })
-            .then((error) => {
+            .catch((error) => {
               reject(error);
             });
         })

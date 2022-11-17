@@ -15,7 +15,10 @@ export interface IMissionModel {
   MissionBagNumEntries: number;
   MissionBagNumTeams: number;
 
-  dateTime: Date;
+  /**
+   * Datetime when mission was parsed from attribuites xml
+   */
+  MissionFinishedDateTime: Date;
 
   /**
    * Model with infos which boss(es) are in
@@ -34,6 +37,11 @@ export interface IMissionModel {
   Accolades: IMissionAccoladeEntryModel[];
   Entries: IMissionBagEntryModel[];
   Teams: IMissionTeamModel[];
+
+  /**
+   * Checksum of the parsed xml file.
+   */
+  xmlChecksum: string;
 }
 
 export class MissionModel implements IMissionModel {
@@ -51,17 +59,19 @@ export class MissionModel implements IMissionModel {
   public MissionBagTeamDetailsVersion: number;
   public PVEModeLastSelected: MapTypeEnum;
 
-  public dateTime: Date;
+  public MissionFinishedDateTime: Date;
 
   public Accolades: MissionAccoladeEntryModel[];
   public Entries: MissionBagEntryModel[];
   public Teams: MissionTeamModel[];
 
+  public xmlChecksum: string = '';
+
   constructor();
   constructor(obj: IMissionModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.uuid = (obj && obj.id) || '';
+    this.uuid = (obj && obj.uuid) || '';
     this.MissionBagFbeGoldBonus = (obj && obj.MissionBagFbeGoldBonus) || 0;
 
     this.MissionBagFbeHunterXpBonus = (obj && obj.MissionBagFbeHunterXpBonus) || 0;
@@ -72,12 +82,14 @@ export class MissionModel implements IMissionModel {
     this.MissionBagNumEntries = (obj && obj.MissionBagNumEntries) || 0;
     this.MissionBagNumTeams = (obj && obj.MissionBagNumTeams) || 0;
 
-    this.dateTime = (obj && obj.dateTime) || new Date();
+    this.MissionFinishedDateTime = (obj && obj.MissionFinishedDateTime) || new Date();
 
     this.Bosses =
       obj && obj.Bosses ? new MissionBagBossesModel(obj.Bosses) : new MissionBagBossesModel();
     this.MissionBagTeamDetailsVersion = (obj && obj.MissionBagTeamDetailsVersion) || 0;
     this.PVEModeLastSelected = (obj && obj.PVEModeLastSelected) || MapTypeEnum.Unknown;
+
+    this.xmlChecksum = (obj && obj.xmlChecksum) || '';
 
     this.Accolades = [];
     this.Entries = [];

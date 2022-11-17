@@ -1,17 +1,5 @@
 <template>
   <v-app :theme="selectedTheme">
-    <!-- <v-app-bar color="grey-lighten-2">
-      <RouterLink to="/">Startup</RouterLink>
-      <RouterLink to="/home">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-      <v-spacer></v-spacer>
-      <v-btn
-        :prepend-icon="selectedTheme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        @click="toggleTheme()"
-        >Toggle Theme</v-btn
-      >
-    </v-app-bar> -->
-
     <v-navigation-drawer v-model="drawer" :rail="rail" permanent @click="rail = false">
       <v-list>
         <v-list-item prepend-avatar="test" title="username" subtitle="last nick name" nav>
@@ -29,14 +17,14 @@
           prepend-icon="mdi-play-circle-outline"
           title="Tracking"
           value="tracking"
-          to="/statistic"
+          to="/record"
         >
         </v-list-item>
         <v-list-item
           prepend-icon="mdi-chart-line"
           title="Statistics"
           value="statistics"
-          to="/about"
+          to="/statistic"
         >
         </v-list-item>
       </v-list>
@@ -59,9 +47,7 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container>
-        <RouterView />
-      </v-container>
+      <RouterView />
     </v-main>
   </v-app>
 </template>

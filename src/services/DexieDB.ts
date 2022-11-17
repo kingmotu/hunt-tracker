@@ -5,6 +5,7 @@ import { LoggerService } from '@/services/index';
 import { IDexieMissionModel } from '@/models/Dexie/DexieMissionModel';
 import { IDexieProfileModel } from '@/models/Dexie/DexieProfileModel';
 import { IDexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
+import { IDexieSteamPlayerProfileModel } from '@/models/Dexie/DexieSteamPlayerProfileModel';
 
 class DexieDB extends Dexie {
   // Declare implicit table properties.
@@ -12,6 +13,7 @@ class DexieDB extends Dexie {
   private profiles: Dexie.Table<IDexieProfileModel, number>; // number = type of the primkey
   private missions: Dexie.Table<IDexieMissionModel, number>; // number = type of the primkey
   private settings: Dexie.Table<IDexieSettingsModel, number>; // number = type of the primkey
+  private players: Dexie.Table<IDexieSteamPlayerProfileModel, number>; // number = type of the primkey
 
   private dexieTableMap: DexieTableMap = new DexieTableMap();
 
@@ -29,6 +31,7 @@ class DexieDB extends Dexie {
       profiles: '++id,uuid',
       missions: '++id,uuid',
       settings: '++id,uuid',
+      players: '++id,uuid',
     });
 
     // The following line is needed if your typescript
@@ -36,6 +39,7 @@ class DexieDB extends Dexie {
     this.profiles = this.table(this.dexieTableMap.profiles);
     this.missions = this.table(this.dexieTableMap.missions);
     this.settings = this.table(this.dexieTableMap.settings);
+    this.players = this.table(this.dexieTableMap.players);
   }
 
   public getTables(): DexieTableMap {
