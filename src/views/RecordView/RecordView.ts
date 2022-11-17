@@ -19,6 +19,7 @@ export default defineComponent({
     isWatching: ref(false),
     isProcessing: ref(false),
     tab: null,
+    huntProfileId: 0,
   }),
   created() {
     // SettingsService.FetchSettings(SettingsService.LastUsedSettingsUuid)
@@ -52,6 +53,7 @@ export default defineComponent({
     setProfile(profile?: DexieProfileModel) {
       if (profile) {
         this.profile = profile;
+        this.huntProfileId = profile.huntProfileId;
       }
     },
     startWatchAttribuesXml() {
@@ -117,6 +119,22 @@ export default defineComponent({
         .finally(() => {
           this.isProcessing = false;
         });
+    },
+    getStarRating(mmr: number) {
+      let stars = 1;
+      if (mmr >= 2000 && mmr < 2300) {
+        stars = 2;
+      } else if (mmr >= 2300 && mmr < 2600) {
+        stars = 3;
+      } else if (mmr >= 2600 && mmr < 2750) {
+        stars = 4;
+      } else if (mmr >= 2750 && mmr < 3000) {
+        stars = 5;
+      } else if (mmr > 3000) {
+        stars = 6;
+      }
+
+      return stars;
     },
   },
 });

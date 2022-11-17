@@ -24,7 +24,9 @@ async function createWindow() {
       preload,
       nodeIntegration: true,
       contextIsolation: false
-    }
+    },
+    width: 1440,
+    height: 800
   });
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(url);
