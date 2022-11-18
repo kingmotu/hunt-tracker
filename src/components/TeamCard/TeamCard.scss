@@ -1,0 +1,32 @@
+.team-card {
+  .team {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    margin-bottom: 10px;
+
+    border-left: 1px solid red;
+
+    &.own-team {
+      border-left: 1px solid green;
+    }
+  }
+
+  &.v-card {
+    .v-card-text {
+      padding-bottom: 0;
+    }
+
+    .team-name,
+    .player-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .v-list-item--variant-plain:focus,
+    .v-list-item--variant-plain:hover {
+      cursor: pointer;
+    }
+  }
+}

@@ -2,7 +2,7 @@
   position: relative;
   height: 100%;
   .content {
-    min-height: 90%;
+    // min-height: 90%;
     .mission {
       display: flex;
       flex-direction: column;
@@ -45,7 +45,7 @@
   }
 
   .footer {
-    position: absolute;
+    position: sticky;
     bottom: 0;
     left: 0;
     width: 100%;

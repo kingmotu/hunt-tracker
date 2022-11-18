@@ -6,9 +6,13 @@ import { MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
 import { DexieProfileModel } from '@/models/Dexie/DexieProfileModel';
 
+import TeamCard from '@/components/TeamCard/TeamCard.vue';
+
 export default defineComponent({
   name: 'RecordView',
-  components: {},
+  components: {
+    TeamCard,
+  },
   data: () => ({
     settings: ref<DexieSettingsModel>(),
     profile: ref<DexieProfileModel>(),
@@ -119,22 +123,6 @@ export default defineComponent({
         .finally(() => {
           this.isProcessing = false;
         });
-    },
-    getStarRating(mmr: number) {
-      let stars = 1;
-      if (mmr >= 2000 && mmr < 2300) {
-        stars = 2;
-      } else if (mmr >= 2300 && mmr < 2600) {
-        stars = 3;
-      } else if (mmr >= 2600 && mmr < 2750) {
-        stars = 4;
-      } else if (mmr >= 2750 && mmr < 3000) {
-        stars = 5;
-      } else if (mmr > 3000) {
-        stars = 6;
-      }
-
-      return stars;
     },
   },
 });

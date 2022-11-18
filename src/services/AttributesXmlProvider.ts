@@ -296,6 +296,17 @@ class AttributesXmlProvider {
                   LoggerService.error(error);
                   reject(error);
                 }
+              } else if (key?.search(/TimeMissionUnload/) >= 0 && value) {
+                /**
+                 * Parse mission info from xml
+                 */
+                try {
+                  // this.mission.push({ name: key, value: value });
+                  LoggerService.debug(`################# ${key}: ${value}`);
+                } catch (error) {
+                  LoggerService.error(error);
+                  reject(error);
+                }
               }
             }
           } else {
