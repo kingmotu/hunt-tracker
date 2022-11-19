@@ -1,5 +1,6 @@
 import { IMissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { defineComponent, PropType } from 'vue';
+import { MissionPlayerModel } from '../../models/Mission/MissionPlayerModel';
 
 export default defineComponent({
   name: 'TeamCard',
@@ -27,6 +28,12 @@ export default defineComponent({
       }
 
       return stars;
+    },
+    onPlayerClicked(player: MissionPlayerModel) {
+      window.open(
+        `https://steamcommunity.com/search/users/#text=${player.blood_line_name}`,
+        '_blank',
+      );
     },
   },
 });

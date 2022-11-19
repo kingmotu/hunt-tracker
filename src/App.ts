@@ -40,7 +40,7 @@ export default defineComponent({
   },
   unmounted() {},
   data: () => ({
-    selectedTheme: ref('light'),
+    selectedTheme: ref('dark'),
     drawer: ref(true),
     rail: ref(false),
   }),

@@ -70,37 +70,45 @@ class AttributesXmlProvider {
     return this.onAttributesXmlChanged.expose();
   }
 
+  public get GetIsWatching(): boolean {
+    return this.fileWatcher != null && Object.keys(this.fileWatcher.getWatched()).length > 0;
+  }
+
+  public test(path: string): void {
+    LoggerService.debug(`Checksum: `, this.getChecksum(path));
+  }
+
   public StartWatchAttributesXml(inPath: string): void {
     if (this.fileWatcher == null) {
       this.fileWatcher = chokidar.watch(inPath, { interval: 2000 });
       LoggerService.debug(`watcher created for path: ${inPath}`);
     }
-    this.fileWatcher.on('change', (path, stats) => {
-      this.getChecksum(path)
-        .then((checksum) => {
-          LoggerService.debug(
-            `file changed\noldChecksum: ${this.lastChecksum}\nnewChecksum: ${checksum}`,
-            path,
-            stats,
-          );
-          if (checksum !== this.lastChecksum) {
-            this.lastChecksum = checksum;
-            LoggerService.debug(`read new xml file, new checksum: ${this.lastChecksum}`);
-            this.ReadXmlFile(path, checksum)
-              .then(() => {
-                LoggerService.debug(`xml file opened and parsed`);
-                this.onAttributesXmlChanged.trigger(this.LastMissionLog);
-              })
-              .catch((error) => {
-                LoggerService.error(`error on open/parse file: `, error);
-              });
-          }
-        })
-        .catch((error) => {
-          LoggerService.error(error);
-        });
-    });
-    LoggerService.debug(`start listening for file change events`, this.fileWatcher.getWatched());
+    if (Object.keys(this.fileWatcher.getWatched()).length === 0) {
+      this.fileWatcher.on('change', (path, stats) => {
+        this.getChecksum(path)
+          .then((checksum) => {
+            if (checksum !== this.lastChecksum) {
+              this.lastChecksum = checksum;
+              this.ReadXmlFile(path, checksum)
+                .then(() => {
+                  LoggerService.debug(
+                    `xml file opened and parsed, new checksum: ${this.lastChecksum}`,
+                  );
+                  this.onAttributesXmlChanged.trigger(this.LastMissionLog);
+                })
+                .catch((error) => {
+                  LoggerService.error(`error on open/parse file: `, error);
+                });
+            }
+          })
+          .catch((error) => {
+            LoggerService.error(error);
+          });
+      });
+      LoggerService.debug(`start listening for file change events`, this.fileWatcher.getWatched());
+    } else {
+      LoggerService.info(`already watching attributes.xml: `, this.fileWatcher.getWatched());
+    }
   }
 
   public StopWatchAttributesXml(): void {
@@ -117,20 +125,36 @@ class AttributesXmlProvider {
   public ReadXmlFile(inPath: string, inCheckSum?: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const readFile = (inPath: string, checkSum?: string) => {
-        fsPromise
-          .readFile(inPath)
-          .then((fileContent) => {
-            this.parseXmlValues(fileContent, checkSum)
-              .then(() => {
-                resolve();
-              })
-              .catch((error) => {
-                reject(error);
-              });
-          })
-          .catch((error) => {
-            reject(error);
-          });
+        if (this.checkFileAccess(inPath)) {
+          fsPromise
+            .copyFile(
+              inPath,
+              `D:\\Eigene Dateien\\Hunt\\dev-logs\\${new Date()
+                .toISOString()
+                .replaceAll(':', '_')}.xml`,
+            )
+            .then(() => {
+              fsPromise
+                .readFile(inPath)
+                .then((fileContent) => {
+                  this.parseXmlValues(fileContent, checkSum)
+                    .then(() => {
+                      resolve();
+                    })
+                    .catch((error) => {
+                      reject(error);
+                    });
+                })
+                .catch((error) => {
+                  reject(error);
+                });
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        } else {
+          reject('file is not accessible');
+        }
       };
 
       if (inCheckSum) {
@@ -152,7 +176,6 @@ class AttributesXmlProvider {
       parser
         .parseStringPromise(inFileContent)
         .then((xml: any) => {
-          LoggerService.debug(`parsed xml: `, xml);
           this.players = [[[]]];
           this.accolades = [[]];
           this.entries = [[]];
@@ -302,6 +325,7 @@ class AttributesXmlProvider {
                  */
                 try {
                   // this.mission.push({ name: key, value: value });
+                  // just check for  map change?
                   LoggerService.debug(`################# ${key}: ${value}`);
                 } catch (error) {
                   LoggerService.error(error);
@@ -322,7 +346,6 @@ class AttributesXmlProvider {
             .catch((error) => reject(error));
         })
         .catch((error) => {
-          LoggerService.debug(`xml2js error: `, error);
           reject(error);
         });
     });
@@ -580,18 +603,41 @@ class AttributesXmlProvider {
   private getChecksum(path: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       // if absolutely necessary, use md5
-      const hash = nodeCrypto.createHash('sha256');
+      const hash = nodeCrypto.createHash('sha512');
+      hash.on('error', (error) => reject(error)).setEncoding('base64');
 
-      const input = fs.createReadStream(path);
-      input.on('error', reject);
-      input.on('data', (chunk) => {
-        hash.update(chunk);
-      });
-      input.on('close', () => {
-        resolve(hash.digest('hex'));
-      });
+      if (this.checkFileAccess(path)) {
+        const input = fs.createReadStream(path);
+        input.on('error', reject);
+        input
+          .on('end', () => {
+            hash.end();
+            const newHash = hash.read();
+            resolve(newHash);
+          })
+          .pipe(hash, {
+            end: false,
+          });
+      } else {
+        reject('file is not accessible');
+      }
     });
   }
-}
 
+  /**
+   * Method to check if file is readable
+   * @param filePath
+   * @returns
+   */
+  private checkFileAccess(filePath: string): boolean {
+    let isReadable = false;
+    try {
+      fs.accessSync(filePath, fs.constants.R_OK);
+      isReadable = true;
+    } catch (error) {
+      LoggerService.error(`${filePath} is not accessible!`, error);
+    }
+    return isReadable;
+  }
+}
 export default AttributesXmlProvider;

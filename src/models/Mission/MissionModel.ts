@@ -112,4 +112,23 @@ export class MissionModel implements IMissionModel {
       }
     }
   }
+
+  /**
+   * Compare for some properties besides the checksum
+   * @param obj
+   * @returns
+   */
+  compare(obj: MissionModel): boolean {
+    return (
+      this.MissionBagFbeGoldBonus === obj.MissionBagFbeGoldBonus &&
+      this.MissionBagFbeHunterXpBonus === obj.MissionBagFbeHunterXpBonus &&
+      this.MissionBagIsFbeBonusEnabled === obj.MissionBagIsFbeBonusEnabled &&
+      this.MissionBagIsHunterDead === obj.MissionBagIsHunterDead &&
+      this.MissionBagIsQuickPlay === obj.MissionBagIsQuickPlay &&
+      this.MissionBagNumAccolades === obj.MissionBagNumAccolades &&
+      this.MissionBagNumEntries === obj.MissionBagNumEntries &&
+      this.MissionBagNumTeams === obj.MissionBagNumTeams &&
+      this.MissionBagTeamDetailsVersion === obj.MissionBagTeamDetailsVersion
+    );
+  }
 }

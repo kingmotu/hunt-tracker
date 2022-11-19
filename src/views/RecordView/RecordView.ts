@@ -41,12 +41,22 @@ export default defineComponent({
     //     LoggerService.error(error);
     //   });
   },
-  mounted() {
+  beforeMount() {
     this.setSettings(SettingsService.Settings);
     SettingsService.OnSettingsChanged.on(this.setSettings);
     this.setProfile(ProfileService.UserProfile);
     ProfileService.OnProfileChanged.on(this.setProfile);
     this.fetchLastMission();
+    if (AttributesXmlService.GetIsWatching === true) {
+      LoggerService.debug('already watching file');
+      AttributesXmlService.OnAttributesXmlChanged.off(this.processMissionData);
+      AttributesXmlService.OnAttributesXmlChanged.on(this.processMissionData);
+      this.isWatching = true;
+    }
+  },
+  mounted() {},
+  beforeUnmount() {
+    AttributesXmlService.OnAttributesXmlChanged.off(this.processMissionData);
   },
   methods: {
     setSettings(settings?: DexieSettingsModel) {
@@ -62,9 +72,11 @@ export default defineComponent({
     },
     startWatchAttribuesXml() {
       if (this.settings) {
+        AttributesXmlService.OnAttributesXmlChanged.off(this.processMissionData);
         AttributesXmlService.OnAttributesXmlChanged.on(this.processMissionData);
         AttributesXmlService.StartWatchAttributesXml(this.settings.huntAttriburesXmlPath);
         this.isWatching = true;
+        // AttributesXmlService.test(this.settings.huntAttriburesXmlPath);
       }
     },
     stopWatchAttribuesXml() {
@@ -107,22 +119,26 @@ export default defineComponent({
       }
     },
     saveMissionDataToDB(inMissionModel: MissionModel, wasFirst: boolean = false) {
-      MissionService.AddNewMission(inMissionModel)
-        .then((dexieMissionData) => {
-          LoggerService.debug(`new mission processed and saved: ${dexieMissionData}`);
-          this.missionData = dexieMissionData;
-          this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
-          this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
-          if (wasFirst) {
-            this.first = false;
-          }
-        })
-        .catch((error) => {
-          LoggerService.error(error);
-        })
-        .finally(() => {
-          this.isProcessing = false;
-        });
+      if (this.missionData && inMissionModel.compare(this.missionData) === true) {
+        LoggerService.warn(`Mission data seems to be the same: `, this.missionData, inMissionModel);
+      } else {
+        MissionService.AddNewMission(inMissionModel)
+          .then((dexieMissionData) => {
+            LoggerService.debug(`new mission processed and saved: ${dexieMissionData}`);
+            this.missionData = dexieMissionData;
+            this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
+            this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
+            if (wasFirst) {
+              this.first = false;
+            }
+          })
+          .catch((error) => {
+            LoggerService.error(error);
+          })
+          .finally(() => {
+            this.isProcessing = false;
+          });
+      }
     },
   },
 });

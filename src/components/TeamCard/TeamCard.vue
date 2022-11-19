@@ -5,12 +5,29 @@
     :class="{ 'own-team': teamIndex == null }"
   >
     <template v-slot:title>
-      <div v-if="teamIndex" class="team-name">{{ `Team ${teamIndex}` }}</div>
-      <div v-else class="team-name">{{ `Your team` }}</div>
+      <v-row no-gutters>
+        <v-col cols="3">
+          <div v-if="teamIndex" class="team-name">{{ `Team ${teamIndex}` }}</div>
+          <div v-else class="team-name">{{ `Your team` }}</div>
+        </v-col>
+        <v-col cols="3">
+          <v-rating
+            :model-value="getStarRating(team.mmr)"
+            size="small"
+            length="6"
+            density="compact"
+            class="px-2 mt-n1"
+            readonly
+          ></v-rating>
+        </v-col>
+        <v-col cols="2">
+          <div class="mmr text-body-2">({{ team.mmr }})</div>
+        </v-col>
+      </v-row>
     </template>
 
     <template v-slot:subtitle>
-      <div class="d-flex align-center">
+      <!-- <div class="d-flex align-center">
         <v-rating
           :model-value="getStarRating(team.mmr)"
           size="small"
@@ -20,7 +37,7 @@
           readonly
         ></v-rating>
         <div class="mmr text-body-2">({{ team.mmr }})</div>
-      </div>
+      </div> -->
     </template>
 
     <template v-slot:text>
@@ -30,6 +47,7 @@
           :key="playerIndex"
           variant="plain"
           min-height="auto"
+          @click="onPlayerClicked(player)"
         >
           <v-list-item-title>
             <v-row no-gutters>
