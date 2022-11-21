@@ -1,4 +1,4 @@
-import { MissionLogTypeEnum } from '../../enums/MissionLogTypeEnum';
+import { MissionLogTypeEnum } from '@/enums/MissionLogTypeEnum';
 export interface IMissionPlayerTooltipModel {
   /**
    * Text of the tooltip

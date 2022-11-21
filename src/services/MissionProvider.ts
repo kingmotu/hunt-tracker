@@ -273,7 +273,7 @@ class MissionProvider {
                   text: tooltip.text,
                   additionalText: tooltip.additionalText,
                   eventTime: tooltip.dateTime,
-                  eventTimeString: tooltip.time,
+                  eventTimeString: tooltip.time.length <= 4 ? `0${tooltip.time}` : tooltip.time,
                   type: tooltip.type,
                   wasTeammate: tooltip.wasTeammate,
                 }),
@@ -435,7 +435,7 @@ class MissionProvider {
               time: parts[index + 1],
               dateTime: getTimes(parts[index + 1]),
               wasTeammate: key.includes('team'),
-              type: MissionLogTypeEnum.Bounty,
+              type: this.getTooltipType(key),
             }),
           );
         }
@@ -448,9 +448,7 @@ class MissionProvider {
               time: parts[index + 3],
               dateTime: getTimes(parts[index + 3]),
               wasTeammate: key.includes('team'),
-              type: inTooltip.includes('kill')
-                ? MissionLogTypeEnum.Kill
-                : MissionLogTypeEnum.Downed,
+              type: this.getTooltipType(key),
             }),
           );
         }
@@ -459,6 +457,47 @@ class MissionProvider {
       LoggerService.error(`Error on parse tooltip: `, error);
     }
     return tooltips;
+  }
+
+  private getTooltipType(inKey: string): MissionLogTypeEnum {
+    let tooltipType = MissionLogTypeEnum.Unknown;
+    switch (inKey) {
+      case 'tooltipbountyextracted':
+        tooltipType = MissionLogTypeEnum.BountyExtracted;
+        break;
+      case 'tooltipbountypickedup':
+        tooltipType = MissionLogTypeEnum.BountyPickedUp;
+        break;
+      case 'tooltip_downedbyteammate':
+        tooltipType = MissionLogTypeEnum.DownedByTeammate;
+        break;
+      case 'tooltipdownedbyme':
+        tooltipType = MissionLogTypeEnum.DownedByMe;
+        break;
+      case 'tooltipdownedme':
+        tooltipType = MissionLogTypeEnum.DownedMe;
+        break;
+      case 'tooltipdownedteammate':
+        tooltipType = MissionLogTypeEnum.DownedTeammate;
+        break;
+      case 'tooltipkilledbyme':
+        tooltipType = MissionLogTypeEnum.KilledByMe;
+        break;
+      case 'tooltipkilledbyteammate':
+        tooltipType = MissionLogTypeEnum.KilledByTeammate;
+        break;
+      case 'tooltipkilledme':
+        tooltipType = MissionLogTypeEnum.KilledMe;
+        break;
+      case 'tooltipkilledteammate':
+        tooltipType = MissionLogTypeEnum.KilledTeammate;
+        break;
+
+      default:
+        break;
+    }
+
+    return tooltipType;
   }
 }
 
