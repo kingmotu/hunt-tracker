@@ -425,6 +425,7 @@ class AttributesXmlProvider {
     inTeams.forEach((team, index) => {
       const newTeam = new MissionTeamModel();
       newTeam.teamId = index;
+      newTeam.originalTeamId = index;
 
       for (const key in newTeam) {
         if (Object.prototype.hasOwnProperty.call(newTeam, key)) {

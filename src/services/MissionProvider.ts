@@ -192,6 +192,7 @@ class MissionProvider {
       const notSavedPlayers: MissionPlayerModel[] = [];
       const dexieMission = new DexieMissionModel(inMission);
       dexieMission.uuid = crypto.randomUUID();
+      dexieMission.playerProfileId = ProfileService.UserProfile.huntProfileId || 0;
 
       const missionLog: MissionLogModel[] = [];
 
@@ -206,8 +207,9 @@ class MissionProvider {
       orderedTeams.forEach((team, index) => {
         team.teamId = index;
       });
+      dexieMission.Teams = orderedTeams;
 
-      orderedTeams.forEach((missionTeam, teamIndex) =>
+      dexieMission.Teams.forEach((missionTeam, teamIndex) =>
         missionTeam.players.forEach(async (missionTeamPlayer) => {
           await this.processPlayer(
             missionTeamPlayer,
@@ -235,6 +237,8 @@ class MissionProvider {
           return 0;
         }
       });
+
+      dexieMission.missionLog = missionLog;
 
       LoggerService.debug(`saved players: `, savedPlayers);
       LoggerService.debug(`not saved players: `, notSavedPlayers);

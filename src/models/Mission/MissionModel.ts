@@ -16,6 +16,11 @@ export interface IMissionModel {
   MissionBagNumTeams: number;
 
   /**
+   * Profile id of palyer who played the mission
+   */
+  playerProfileId: number;
+
+  /**
    * Datetime when mission was parsed from attribuites xml
    */
   MissionFinishedDateTime: Date;
@@ -55,6 +60,8 @@ export class MissionModel implements IMissionModel {
   public MissionBagNumEntries: number;
   public MissionBagNumTeams: number;
 
+  public playerProfileId: number;
+
   public Bosses: MissionBagBossesModel;
   public MissionBagTeamDetailsVersion: number;
   public PVEModeLastSelected: MapTypeEnum;
@@ -83,6 +90,7 @@ export class MissionModel implements IMissionModel {
     this.MissionBagNumTeams = (obj && obj.MissionBagNumTeams) || 0;
 
     this.MissionFinishedDateTime = (obj && obj.MissionFinishedDateTime) || new Date();
+    this.playerProfileId = (obj && obj.playerProfileId) || 0;
 
     this.Bosses =
       obj && obj.Bosses ? new MissionBagBossesModel(obj.Bosses) : new MissionBagBossesModel();

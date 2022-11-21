@@ -26,9 +26,11 @@
       <v-tabs v-model="tab" bg-color="" centered>
         <v-tab value="tab-1"> Teams </v-tab>
 
-        <v-tab value="tab-2"> Events </v-tab>
+        <v-tab value="tab-2"> Mission-Log </v-tab>
 
-        <v-tab value="tab-3"> Summary </v-tab>
+        <v-tab value="tab-3"> Events </v-tab>
+
+        <v-tab value="tab-4"> Summary </v-tab>
       </v-tabs>
 
       <v-window v-model="tab">
@@ -46,9 +48,14 @@
           </v-container>
         </v-window-item>
         <v-window-item value="tab-2">
-          <v-container> Events </v-container>
+          <v-container>
+            <MissonLog :mission-log="dexieMissionData.missionLog" />
+          </v-container>
         </v-window-item>
         <v-window-item value="tab-3">
+          <v-container> Events </v-container>
+        </v-window-item>
+        <v-window-item value="tab-4">
           <v-container> Summary </v-container>
         </v-window-item>
       </v-window>

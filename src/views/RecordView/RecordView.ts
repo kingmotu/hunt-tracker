@@ -5,18 +5,22 @@ import { MissionModel } from '@/models/Mission/MissionModel';
 import { MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
 import { DexieProfileModel } from '@/models/Dexie/DexieProfileModel';
+import { DexieMissionModel } from '@/models/Dexie/DexieMissionModel';
 
 import TeamCard from '@/components/TeamCard/TeamCard.vue';
+import MissonLog from '@/components/MissionLog/MissionLog.vue';
 
 export default defineComponent({
   name: 'RecordView',
   components: {
     TeamCard,
+    MissonLog,
   },
   data: () => ({
     settings: ref<DexieSettingsModel>(),
     profile: ref<DexieProfileModel>(),
     missionData: ref<MissionModel>(),
+    dexieMissionData: ref<DexieMissionModel>(),
     ownTeam: ref<MissionTeamModel>(),
     teams: ref<MissionTeamModel[]>(),
     first: ref(true),
@@ -143,10 +147,17 @@ export default defineComponent({
     },
     test() {
       if (import.meta.env.DEV) {
-        AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`)
+        // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`)
+        AttributesXmlService.ReadXmlFile(this.settings.huntAttriburesXmlPath)
           .then(() => {
             const missionModel = AttributesXmlService.LastMissionLog;
-            this.saveMissionDataToDB(missionModel, true);
+            MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
+              LoggerService.debug(`test mission processed: ${dexieMissionData}`);
+              this.missionData = dexieMissionData;
+              this.dexieMissionData = dexieMissionData;
+              this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
+              this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
+            });
           })
           .catch((error) => {
             LoggerService.error(error);
