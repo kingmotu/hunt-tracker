@@ -24,6 +24,7 @@ export default defineComponent({
     isProcessing: ref(false),
     tab: null,
     huntProfileId: 0,
+    develop: import.meta.env.DEV,
   }),
   created() {
     // SettingsService.FetchSettings(SettingsService.LastUsedSettingsUuid)
@@ -137,6 +138,18 @@ export default defineComponent({
           })
           .finally(() => {
             this.isProcessing = false;
+          });
+      }
+    },
+    test() {
+      if (import.meta.env.DEV) {
+        AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`)
+          .then(() => {
+            const missionModel = AttributesXmlService.LastMissionLog;
+            this.saveMissionDataToDB(missionModel, true);
+          })
+          .catch((error) => {
+            LoggerService.error(error);
           });
       }
     },

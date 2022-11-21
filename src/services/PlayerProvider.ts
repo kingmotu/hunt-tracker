@@ -1,7 +1,7 @@
 import DexieDB from './DexieDB';
 import DexieDBProvider from './DexieDBProvider';
 import { DexieSteamPlayerProfileModel } from '@/models/Dexie/DexieSteamPlayerProfileModel';
-import { LiteEvent, ILiteEvent } from '../liteEvent/liteEvent';
+import { LiteEvent, ILiteEvent } from '@/liteEvent/liteEvent';
 import { LoggerService } from './index';
 
 class PlayerProvider {

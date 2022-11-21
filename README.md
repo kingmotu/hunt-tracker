@@ -1,6 +1,9 @@
 # hunt-tracker
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a simple trakcer for Hunt:Showdown mission stats.  
+Hunt saves informations about missions in the attributes.xml after each round you played.  
+This tracker just parses this xml and show some additional informations for each round, e.g. names of all players and mrr as number.  
+So far it may works like huntplayers.com, or similar sites, but no data is send and every thing is just saved local on your pc ;)
 
 ## Recommended IDE Setup
 
@@ -32,6 +35,7 @@ npm install
 ```sh
 npm run dev
 ```
+You can create `.env.development.local` in root and set `VITE_APP_COPY_XML_PATH`. This will create copies of xml files on process in develop mode.
 
 ### Type-Check, Compile and Minify for Production
 

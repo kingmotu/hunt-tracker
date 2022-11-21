@@ -5,8 +5,12 @@ import { MissionModel } from '@/models/Mission/MissionModel';
 import { MissionPlayerModel } from '@/models/Mission/MissionPlayerModel';
 import { PlayerService, ProfileService, LoggerService } from './index';
 import { DexieSteamPlayerProfileModel } from '@/models/Dexie/DexieSteamPlayerProfileModel';
-import { SteamProfileNamesModel } from '../models/Dexie/SteamProfileNamesModel';
+import { SteamProfileNamesModel } from '@/models/Dexie/SteamProfileNamesModel';
 import { MissionPlayerKillsModel } from '@/models/Mission/MissionPlayerKillsModel';
+import { MissionPlayerTooltipsModel } from '@/models/Mission/MissionPlayerTooltipsModel';
+import { MissionLogModel } from '@/models/Mission/MissionLogModel';
+import { MissionPlayerTooltipModel } from '@/models/Mission/MissionPlayerTooltipModel';
+import { MissionLogTypeEnum } from '@/enums/MissionLogTypeEnum';
 
 const missionKey: string = 'ht_mission_uuid';
 
@@ -189,9 +193,28 @@ class MissionProvider {
       const dexieMission = new DexieMissionModel(inMission);
       dexieMission.uuid = crypto.randomUUID();
 
-      inMission.Teams.forEach((missionTeam) =>
+      const missionLog: MissionLogModel[] = [];
+
+      /**
+       * Reorder teams that own team has index 0.
+       * So we have the same team index as ingame overview
+       */
+      const orderedTeams = [
+        ...inMission.Teams.filter((t) => t.ownteam),
+        ...inMission.Teams.filter((t) => !t.ownteam),
+      ];
+      orderedTeams.forEach((team, index) => {
+        team.teamId = index;
+      });
+
+      orderedTeams.forEach((missionTeam, teamIndex) =>
         missionTeam.players.forEach(async (missionTeamPlayer) => {
-          await this.processPlayers(missionTeamPlayer, inMission.MissionFinishedDateTime)
+          await this.processPlayer(
+            missionTeamPlayer,
+            inMission.MissionFinishedDateTime,
+            missionLog,
+            teamIndex,
+          )
             .then((response) => {
               savedPlayers.push(missionTeamPlayer);
               dexieMission.missionKills.append(response);
@@ -202,17 +225,60 @@ class MissionProvider {
             });
         }),
       );
+
+      missionLog.sort((lhs, rhs) => {
+        if (lhs.eventTime.getTime() < rhs.eventTime.getTime()) {
+          return -1;
+        } else if (lhs.eventTime.getTime() > rhs.eventTime.getTime()) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
       LoggerService.debug(`saved players: `, savedPlayers);
       LoggerService.debug(`not saved players: `, notSavedPlayers);
+      LoggerService.debug(`missionLog: `, missionLog);
+
       resolve(dexieMission);
+
+      if (dexieMission == null) {
+        reject();
+      }
     });
   }
 
-  private async processPlayers(
+  private async processPlayer(
     inMissionPlayer: MissionPlayerModel,
     missionDate: Date,
+    inMissionLog: MissionLogModel[],
+    inTeamIndex: number,
   ): Promise<MissionPlayerKillsModel> {
     return new Promise<MissionPlayerKillsModel>((resolve, reject) => {
+      const playerTooltips = this.processPlayerTooltips(inMissionPlayer, missionDate);
+      for (const key in playerTooltips) {
+        if (Object.prototype.hasOwnProperty.call(playerTooltips, key)) {
+          const tooltips = playerTooltips[key] as MissionPlayerTooltipModel[] | undefined;
+          if (tooltips) {
+            tooltips.forEach((tooltip) => {
+              inMissionLog.push(
+                new MissionLogModel({
+                  playerTeamId: inTeamIndex,
+                  playerProfileId: inMissionPlayer.profileid,
+                  playerProfileName: inMissionPlayer.blood_line_name,
+                  text: tooltip.text,
+                  additionalText: tooltip.additionalText,
+                  eventTime: tooltip.dateTime,
+                  eventTimeString: tooltip.time,
+                  type: tooltip.type,
+                  wasTeammate: tooltip.wasTeammate,
+                }),
+              );
+            });
+          }
+        }
+      }
+
       PlayerService.FetchPlayerByProfileId(inMissionPlayer.profileid)
         .then((dexiePlayer) => {
           /**
@@ -266,7 +332,7 @@ class MissionProvider {
         })
         .catch(() => {
           /**
-           * If user profile was not founf, create a new one
+           * If user profile was not found, create a new one
            */
           const dexiePlayer = new DexieSteamPlayerProfileModel({
             firstSeen: missionDate,
@@ -309,6 +375,86 @@ class MissionProvider {
             });
         });
     });
+  }
+
+  private processPlayerTooltips(
+    inPlayer: MissionPlayerModel,
+    inMissionDate: Date,
+  ): MissionPlayerTooltipsModel {
+    const tooltips = new MissionPlayerTooltipsModel();
+    const missionDate = new Date(inMissionDate);
+    missionDate.setMilliseconds(0);
+    missionDate.setSeconds(0);
+
+    for (const key in inPlayer) {
+      if (
+        Object.prototype.hasOwnProperty.call(inPlayer, key) &&
+        key.includes('tooltip') &&
+        Object.prototype.hasOwnProperty.call(tooltips, key)
+      ) {
+        const tooltipToParse = inPlayer[key] as string;
+        if (tooltipToParse.length > 0) {
+          const tooltipsParsed = this.processPlayerTooltip(tooltipToParse, missionDate, key);
+          if (tooltipsParsed.length > 0) {
+            tooltips[key] = tooltipsParsed;
+          }
+        }
+      }
+    }
+
+    return tooltips;
+  }
+
+  private processPlayerTooltip(
+    inTooltip: string,
+    inMissionDate: Date,
+    key: string,
+  ): MissionPlayerTooltipModel[] {
+    const tooltips: MissionPlayerTooltipModel[] = [];
+    const parts = inTooltip.split('~');
+
+    const getTimes = (inTime: string): Date => {
+      const dateTime = new Date(inMissionDate);
+      const timeParts = inTime.split(':');
+      dateTime.setMinutes(dateTime.getMinutes() + parseInt(timeParts[0], 10));
+      dateTime.setSeconds(dateTime.getSeconds() + parseInt(timeParts[1], 10));
+
+      return dateTime;
+    };
+    try {
+      if (inTooltip.includes('bounty')) {
+        for (let index = 0; index < parts.length; index += 2) {
+          tooltips.push(
+            new MissionPlayerTooltipModel({
+              additionalText: '',
+              text: parts[index],
+              time: parts[index + 1],
+              dateTime: getTimes(parts[index + 1]),
+              wasTeammate: key.includes('team'),
+              type: MissionLogTypeEnum.Bounty,
+            }),
+          );
+        }
+      } else {
+        for (let index = 0; index < parts.length; index += 4) {
+          tooltips.push(
+            new MissionPlayerTooltipModel({
+              additionalText: parts[index],
+              text: parts[index + 2],
+              time: parts[index + 3],
+              dateTime: getTimes(parts[index + 3]),
+              wasTeammate: key.includes('team'),
+              type: inTooltip.includes('kill')
+                ? MissionLogTypeEnum.Kill
+                : MissionLogTypeEnum.Downed,
+            }),
+          );
+        }
+      }
+    } catch (error) {
+      LoggerService.error(`Error on parse tooltip: `, error);
+    }
+    return tooltips;
   }
 }
 

@@ -13,7 +13,9 @@
             <v-btn v-else color="red" @click="stopWatchAttribuesXml()"> Stop watching </v-btn>
           </v-col>
           <v-col cols="4"></v-col>
-          <v-col cols="2"> </v-col>
+          <v-col cols="2">
+            <v-btn v-if="develop" color="secondary" @click="test()"> test </v-btn>
+          </v-col>
           <v-col cols="2">
             <v-chip prepend-icon="mdi-record-rec" :color="isWatching ? 'green' : ''">
               watching

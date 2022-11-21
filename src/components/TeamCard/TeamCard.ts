@@ -1,6 +1,6 @@
 import { IMissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { defineComponent, PropType } from 'vue';
-import { MissionPlayerModel } from '../../models/Mission/MissionPlayerModel';
+import { MissionPlayerModel } from '@/models/Mission/MissionPlayerModel';
 
 export default defineComponent({
   name: 'TeamCard',
