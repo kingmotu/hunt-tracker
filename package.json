@@ -1,6 +1,6 @@
 {
   "name": "hunt-tracker",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "main": "dist-electron/main/index.js",
   "description": "Tracking Hunt: SHowdown events from events.xml",
   "author": "kingmotu <kingmotu@gmx.de>",
@@ -9,6 +9,7 @@
     "dev": "vite",
     "build:vite": "run-p type-check build-only",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build:git": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
