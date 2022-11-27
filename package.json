@@ -1,6 +1,6 @@
 {
   "name": "hunt-tracker",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "dist-electron/main/index.js",
   "description": "Tracking Hunt: SHowdown events from events.xml",
   "author": "kingmotu <kingmotu@gmx.de>",
