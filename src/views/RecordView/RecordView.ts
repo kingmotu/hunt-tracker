@@ -95,6 +95,7 @@ export default defineComponent({
         MissionService.FetchMissionByUuid(MissionService.LastUsedMissionUuid)
           .then((missionData) => {
             this.missionData = missionData;
+            this.dexieMissionData = missionData;
             this.ownTeam = missionData.Teams.find((team) => team.ownteam);
             this.teams = missionData.Teams.filter((team) => !team.ownteam);
             if (this.profile) {
@@ -131,6 +132,7 @@ export default defineComponent({
           .then((dexieMissionData) => {
             LoggerService.debug(`new mission processed and saved: ${dexieMissionData}`);
             this.missionData = dexieMissionData;
+            this.dexieMissionData = dexieMissionData;
             this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
             this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
             if (wasFirst) {
