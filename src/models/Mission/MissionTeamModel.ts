@@ -6,6 +6,10 @@ export interface IMissionTeamModel {
    */
   teamId: number;
   /**
+   * Parsed team id/number from xml
+   */
+  originalTeamId: number;
+  /**
    * ???
    */
   value: number;
@@ -40,6 +44,7 @@ export interface IMissionTeamModel {
 
 export class MissionTeamModel implements IMissionTeamModel {
   public teamId: number;
+  public originalTeamId: number;
 
   public value: number;
   public handicap: number;
@@ -54,7 +59,9 @@ export class MissionTeamModel implements IMissionTeamModel {
   constructor(obj: IMissionTeamModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.teamId = (obj && obj.id) || -1;
+    this.teamId = (obj && obj.teamId) || -1;
+    this.originalTeamId = (obj && obj.originalTeamId) || -1;
+
     this.value = (obj && obj.value) || 0;
     this.handicap = (obj && obj.handicap) || 0;
     this.isinvite = (obj && obj.isinvite) || false;

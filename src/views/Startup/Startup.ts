@@ -7,7 +7,7 @@ import {
   SettingsService,
 } from '@/services/index';
 import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
-import { DexieProfileModel } from '../../models/Dexie/DexieProfileModel';
+import { DexieProfileModel } from '@/models/Dexie/DexieProfileModel';
 
 export default defineComponent({
   name: 'Startup',

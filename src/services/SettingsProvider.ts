@@ -1,7 +1,7 @@
 import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
 import DexieDB from './DexieDB';
 import DexieDBProvider from './DexieDBProvider';
-import { LiteEvent, ILiteEvent } from '../liteEvent/liteEvent';
+import { LiteEvent, ILiteEvent } from '@/liteEvent/liteEvent';
 
 const settingsKey: string = 'ht_settings_uuid';
 

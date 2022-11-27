@@ -3,15 +3,14 @@ import { XmlEntrieModel } from '@/models/Xml/XmlEntrieModel';
 import { LoggerService } from '.';
 import { MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { MissionPlayerModel } from '@/models/Mission/MissionPlayerModel';
-import { MissionBagEntryModel } from '../models/Mission/MissionBagEntryModel';
-import { MissionAccoladeEntryModel } from '../models/Mission/MissionAccoladeEntryModel';
-
+import { MissionBagEntryModel } from '@/models/Mission/MissionBagEntryModel';
+import { MissionAccoladeEntryModel } from '@/models/Mission/MissionAccoladeEntryModel';
+import { MissionBagBossesModel } from '@/models/Mission/MissionBagBossesModel';
+import { MapTypeEnum } from '@/enums/MapTypeEnum';
+import { ILiteEvent, LiteEvent } from '@/liteEvent/liteEvent';
 import { FSWatcher } from 'chokidar';
 import * as fsPromise from 'fs/promises';
 import * as fs from 'fs';
-import { MissionBagBossesModel } from '../models/Mission/MissionBagBossesModel';
-import { MapTypeEnum } from '@/enums/MapTypeEnum';
-import { ILiteEvent, LiteEvent } from '../liteEvent/liteEvent';
 
 const chokidar = require('chokidar');
 const xml2js = require('xml2js');
@@ -93,6 +92,7 @@ class AttributesXmlProvider {
                 .then(() => {
                   LoggerService.debug(
                     `xml file opened and parsed, new checksum: ${this.lastChecksum}`,
+                    stats,
                   );
                   this.onAttributesXmlChanged.trigger(this.LastMissionLog);
                 })
@@ -125,35 +125,22 @@ class AttributesXmlProvider {
   public ReadXmlFile(inPath: string, inCheckSum?: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const readFile = (inPath: string, checkSum?: string) => {
-        if (this.checkFileAccess(inPath)) {
-          fsPromise
-            .copyFile(
-              inPath,
-              `D:\\Eigene Dateien\\Hunt\\dev-logs\\${new Date()
-                .toISOString()
-                .replaceAll(':', '_')}.xml`,
-            )
+        if (import.meta.env.DEV && import.meta.env.VITE_APP_COPY_XML_PATH) {
+          this.readFileDebug(inPath, checkSum)
             .then(() => {
-              fsPromise
-                .readFile(inPath)
-                .then((fileContent) => {
-                  this.parseXmlValues(fileContent, checkSum)
-                    .then(() => {
-                      resolve();
-                    })
-                    .catch((error) => {
-                      reject(error);
-                    });
-                })
-                .catch((error) => {
-                  reject(error);
-                });
+              resolve();
             })
             .catch((error) => {
               reject(error);
             });
         } else {
-          reject('file is not accessible');
+          this.readFile(inPath, checkSum)
+            .then(() => {
+              resolve();
+            })
+            .catch((error) => {
+              reject(error);
+            });
         }
       };
 
@@ -438,6 +425,7 @@ class AttributesXmlProvider {
     inTeams.forEach((team, index) => {
       const newTeam = new MissionTeamModel();
       newTeam.teamId = index;
+      newTeam.originalTeamId = index;
 
       for (const key in newTeam) {
         if (Object.prototype.hasOwnProperty.call(newTeam, key)) {
@@ -638,6 +626,62 @@ class AttributesXmlProvider {
       LoggerService.error(`${filePath} is not accessible!`, error);
     }
     return isReadable;
+  }
+
+  private readFile(inPath: string, checkSum?: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.checkFileAccess(inPath)) {
+        fsPromise
+          .readFile(inPath)
+          .then((fileContent) => {
+            this.parseXmlValues(fileContent, checkSum)
+              .then(() => {
+                resolve();
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } else {
+        reject('file is not accessible');
+      }
+    });
+  }
+
+  private readFileDebug(inPath: string, checkSum?: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.checkFileAccess(inPath)) {
+        const copyPath = `${import.meta.env.VITE_APP_COPY_XML_PATH}${new Date()
+          .toISOString()
+          .replaceAll(':', '_')}.xml`;
+        fsPromise
+          .copyFile(inPath, copyPath)
+          .then(() => {
+            fsPromise
+              .readFile(inPath)
+              .then((fileContent) => {
+                this.parseXmlValues(fileContent, checkSum)
+                  .then(() => {
+                    resolve();
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } else {
+        reject('file is not accessible');
+      }
+    });
   }
 }
 export default AttributesXmlProvider;

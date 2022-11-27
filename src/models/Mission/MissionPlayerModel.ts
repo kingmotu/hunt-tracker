@@ -148,7 +148,7 @@ export class MissionPlayerModel implements IMissionPlayerModel {
   constructor(obj: IMissionPlayerModel);
   // eslint-disable-next-line
   constructor(obj?: any) {
-    this.teamPlayerId = (obj && obj.subId) || -1;
+    this.teamPlayerId = (obj && obj.teamPlayerId) || -1;
 
     this.blood_line_name = (obj && obj.blood_line_name) || '';
     this.bountyextracted = (obj && obj.bountyextracted) || 0;
