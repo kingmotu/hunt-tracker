@@ -20,6 +20,26 @@
           to="/record"
         >
         </v-list-item>
+        <v-list-group value="History" prepend-icon="mdi-script-text-outline">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="History"></v-list-item>
+          </template>
+
+          <v-list-item
+            prepend-icon="mdi-bow-arrow"
+            title="Missions"
+            value="missions"
+            to="/missions"
+          >
+          </v-list-item>
+          <v-list-item
+            prepend-icon="mdi-account-multiple-outline"
+            title="Players"
+            value="players"
+            to="/players"
+          >
+          </v-list-item>
+        </v-list-group>
         <v-list-item
           prepend-icon="mdi-chart-line"
           title="Statistics"
