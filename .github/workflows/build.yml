@@ -1,19 +1,18 @@
 name: CI-Build/release
 
-on: 
+on:
   push:
     branches:
-    # this will run on the electron branch
+      # this will run on the electron branch
       - master
 
 jobs:
-  release:
-    build_on_win:
-    runs-on: windows-2016
-    steps:
+  build_on_win:
+  runs-on: windows-2016
+  steps:
     - uses: actions/checkout@master
       with:
-        ref: feature/github-actions        
+        ref: feature/github-actions
     - uses: actions/setup-node@master
       with:
         node-version: 10.16
