@@ -164,5 +164,25 @@ export default defineComponent({
           });
       }
     },
+    test2() {
+      if (import.meta.env.DEV) {
+        // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`) 3743e407-8d68-4aea-bd64-c5acffa9b80c
+        MissionService.FetchMissionByUuid('ddd76e88-4af4-4e20-b1ba-0a5211a08a54')
+          .then((missionModel) => {
+            const testinfo = missionModel.Teams.map((t) => t.players.map((p) => p.killedbyme));
+            LoggerService.debug(`testinofo: `, testinfo);
+            MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
+              LoggerService.debug(`test mission processed: ${dexieMissionData}`);
+              this.missionData = dexieMissionData;
+              this.dexieMissionData = dexieMissionData;
+              this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
+              this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
+            });
+          })
+          .catch((error) => {
+            LoggerService.error(error);
+          });
+      }
+    },
   },
 });

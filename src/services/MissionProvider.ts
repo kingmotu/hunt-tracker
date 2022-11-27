@@ -426,7 +426,22 @@ class MissionProvider {
       return dateTime;
     };
     try {
-      if (inTooltip.includes('bounty')) {
+      if (key === 'tooltipbountyextracted') {
+        for (let index = 0; index < parts.length; index += 2) {
+          if (parts[index].includes('extracted')) {
+            tooltips.push(
+              new MissionPlayerTooltipModel({
+                additionalText: '',
+                text: parts[index],
+                time: parts[index + 1],
+                dateTime: getTimes(parts[index + 1]),
+                wasTeammate: key.includes('team'),
+                type: this.getTooltipType(key),
+              }),
+            );
+          }
+        }
+      } else if (key === 'tooltipbountypickedup') {
         for (let index = 0; index < parts.length; index += 2) {
           tooltips.push(
             new MissionPlayerTooltipModel({
