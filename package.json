@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "vite",
     "build:vite": "run-p type-check build-only",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
-    "build:git": "vue-tsc --noEmit && vite build",
+    "build:local": "vue-tsc --noEmit && vite build && electron-builder",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
