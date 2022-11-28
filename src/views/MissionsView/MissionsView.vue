@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in missions" :key="item.uuid">
+        <tr v-for="item in missions" :key="item.uuid" @click="onMissionClicked(item)">
           <td>{{ item.MissionFinishedDateTime.toLocaleString() }}</td>
           <td>{{ getMode(item) }}</td>
           <td>
@@ -55,6 +55,20 @@
         </tr>
       </tbody>
     </v-table>
+
+    <v-dialog v-model="showMission" contained scrollable transition="dialog-bottom-transition">
+      <v-btn
+        icon="mdi-close-thick"
+        color=""
+        size="small"
+        variant="text"
+        class="align-self-end"
+        @click="onCloseMissionOverview()"
+      ></v-btn>
+      <v-sheet class="pa-2">
+        <MissonOverview :data="missionData" />
+      </v-sheet>
+    </v-dialog>
   </div>
 </template>
 

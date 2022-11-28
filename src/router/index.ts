@@ -25,7 +25,7 @@ const router = createRouter({
       component: () => import('@/views/StatisticView/StatisticView.vue'),
     },
     {
-      path: '/missions',
+      path: '/missions/:missionUuid?',
       name: 'missions',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route

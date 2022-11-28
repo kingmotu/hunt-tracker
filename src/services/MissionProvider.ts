@@ -127,7 +127,7 @@ class MissionProvider {
         .then((missions) => {
           const mission = missions.find((p) => p.uuid === missionUuid);
           if (mission) {
-            resolve(mission);
+            resolve(new DexieMissionModel(mission));
           } else {
             reject(`could not find mission with uuid: ${missionUuid}`);
           }
