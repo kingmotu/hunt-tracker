@@ -127,7 +127,7 @@ class MissionProvider {
         .then((missions) => {
           const mission = missions.find((p) => p.uuid === missionUuid);
           if (mission) {
-            resolve(mission);
+            resolve(new DexieMissionModel(mission));
           } else {
             reject(`could not find mission with uuid: ${missionUuid}`);
           }
@@ -391,11 +391,7 @@ class MissionProvider {
     missionDate.setSeconds(0);
 
     for (const key in inPlayer) {
-      if (
-        Object.prototype.hasOwnProperty.call(inPlayer, key) &&
-        key.includes('tooltip') &&
-        Object.prototype.hasOwnProperty.call(tooltips, key)
-      ) {
+      if (Object.prototype.hasOwnProperty.call(inPlayer, key) && key.includes('tooltip')) {
         const tooltipToParse = inPlayer[key] as string;
         if (tooltipToParse.length > 0) {
           const tooltipsParsed = this.processPlayerTooltip(tooltipToParse, missionDate, key);
