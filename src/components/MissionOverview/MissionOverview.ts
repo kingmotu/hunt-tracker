@@ -6,12 +6,16 @@ import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
 import { MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 
 import MissionLog from '@/components/MissionLog/MissionLog.vue';
+import MissionEvents from '@/components/MissionEvents/MissionEvents.vue';
+import MissionSummary from '@/components/MissionSummary/MissionSummary.vue';
 import TeamCard from '@/components/TeamCard/TeamCard.vue';
 
 export default defineComponent({
   name: 'MissionOverview',
   components: {
     MissionLog,
+    MissionEvents,
+    MissionSummary,
     TeamCard,
   },
   props: {
