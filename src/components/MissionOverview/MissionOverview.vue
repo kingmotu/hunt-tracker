@@ -30,10 +30,14 @@
         </v-container>
       </v-window-item>
       <v-window-item value="tab-3">
-        <v-container> Events </v-container>
+        <v-container>
+          <MissionEvents :mission-entries="missionData.Entries" />
+        </v-container>
       </v-window-item>
       <v-window-item value="tab-4">
-        <v-container> Summary </v-container>
+        <v-container>
+          <MissionSummary :mission-accolades="missionData.Accolades" />
+        </v-container>
       </v-window-item>
     </v-window>
   </div>

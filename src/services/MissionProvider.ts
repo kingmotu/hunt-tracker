@@ -240,9 +240,18 @@ class MissionProvider {
 
       dexieMission.missionLog = missionLog;
 
-      LoggerService.debug(`saved players: `, savedPlayers);
-      LoggerService.debug(`not saved players: `, notSavedPlayers);
+      dexieMission.Entries.forEach((entry) => {
+        if (entry.category === 'accolade_players_killed_assist') {
+          if (dexieMission.missionKills.assists == null) {
+            dexieMission.missionKills.assists = 1;
+          } else {
+            dexieMission.missionKills.assists += 1;
+          }
+        }
+      });
+
       LoggerService.debug(`missionLog: `, missionLog);
+      LoggerService.debug(`missionKills: `, dexieMission.missionKills);
 
       resolve(dexieMission);
 

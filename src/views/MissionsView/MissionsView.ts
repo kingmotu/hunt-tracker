@@ -76,18 +76,24 @@ export default defineComponent({
       this.showMission = false;
     },
     loadMissionData(inMissionUuid: string): void {
+      if (inMissionUuid == null || inMissionUuid === '') {
+        return;
+      }
+
       const mission = this.missions.find((m) => m.uuid === inMissionUuid);
       if (mission) {
         this.missionData = mission;
         this.showMission = true;
+        LoggerService.debug(`mission data: `, this.missionData);
       } else {
         MissionService.FetchMissionByUuid(inMissionUuid)
           .then((missionData) => {
             this.missionData = missionData;
             this.showMission = true;
+            LoggerService.debug(`mission data: `, this.missionData);
           })
           .catch((error) => {
-            LoggerService.error(error);
+            LoggerService.error(`inMissionUuid: ${inMissionUuid}`, error);
             this.showMission = false;
           });
       }
