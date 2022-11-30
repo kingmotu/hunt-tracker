@@ -214,6 +214,11 @@
   dependencies:
     "@types/ms" "*"
 
+"@types/downloadjs@^1.4.3":
+  "integrity" "sha512-MjJepFle/tLtT2/jmDNth6ZnwWzEhm40L+olE5HKR70ISUCfgT55eqreeHldAzFLY2HDUGsn8zgyto8KygN0CA=="
+  "resolved" "https://registry.npmjs.org/@types/downloadjs/-/downloadjs-1.4.3.tgz"
+  "version" "1.4.3"
+
 "@types/fs-extra@^9.0.11":
   "integrity" "sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA=="
   "resolved" "https://registry.npmjs.org/@types/fs-extra/-/fs-extra-9.0.13.tgz"
@@ -1163,7 +1168,12 @@
   "resolved" "https://registry.npmjs.org/detect-node/-/detect-node-2.1.0.tgz"
   "version" "2.1.0"
 
-"dexie@^3.2.2":
+"dexie-export-import@^1.0.3":
+  "integrity" "sha512-oun27bUUEaeOfSZ8Cv3Nvj5s0LeANYBYQ7ROpF/3Zg1X/IALUnrX0hk5ZUMlYC3s99kFHimXX57ac5AlOdMzWw=="
+  "resolved" "https://registry.npmjs.org/dexie-export-import/-/dexie-export-import-1.0.3.tgz"
+  "version" "1.0.3"
+
+"dexie@^3.0.0 || ^2.0.4", "dexie@^3.2.2":
   "integrity" "sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg=="
   "resolved" "https://registry.npmjs.org/dexie/-/dexie-3.2.2.tgz"
   "version" "3.2.2"
@@ -1227,6 +1237,11 @@
   "integrity" "sha512-I9OvvrHp4pIARv4+x9iuewrWycX6CcZtoAu1XrzPxc5UygMJXJZYmBsynku8IkrJwgypE5DGNjDPmPRhDCptUg=="
   "resolved" "https://registry.npmjs.org/dotenv/-/dotenv-9.0.2.tgz"
   "version" "9.0.2"
+
+"downloadjs@^1.4.7":
+  "integrity" "sha512-LN1gO7+u9xjU5oEScGFKvXhYf7Y/empUIIEAGBs1LzUq/rg5duiDrkuH5A2lQGd5jfMOb9X9usDa2oVXwJ0U/Q=="
+  "resolved" "https://registry.npmjs.org/downloadjs/-/downloadjs-1.4.7.tgz"
+  "version" "1.4.7"
 
 "duplexer3@^0.1.4":
   "integrity" "sha512-1A8za6ws41LQgv9HrE/66jyC5yuSjQ3L/KOpFtoBilsAK2iA2wuS5rTt1OCzIvtS2V7nVmedsUU+DGRcjBmOYA=="
