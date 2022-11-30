@@ -41,6 +41,14 @@ const router = createRouter({
       component: () => import('@/views/PlayersView/PlayersView.vue'),
     },
     {
+      path: '/imexport',
+      name: 'imexport',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('@/views/ImExportView/ImExportView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)',
       name: 'bad-not-found',
       redirect: '/',
