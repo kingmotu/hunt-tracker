@@ -1,5 +1,6 @@
 import DexieDB from './DexieDB';
 import { LoggerService } from '@/services/index';
+import 'dexie-export-import';
 
 class DexieDBProvider {
   /**
@@ -31,19 +32,26 @@ class DexieDBProvider {
     return DexieDBProvider.instance;
   }
 
-  public deleteDataBase() {
-    if (process.env.VUE_APP_DEVELOPE === 'true') {
-      this.dexieDB
-        .delete()
-        .then(() => {
-          LoggerService.LogDebug(`Database successfully deleted`);
-        })
-        .catch((err) => {
-          LoggerService.LogWarn(`Could not delete database: `, err);
-        });
-    } else {
-      LoggerService.LogWarn(`THis function is only available for development mode`);
-    }
+  public DeleteDataBase() {
+    this.dexieDB
+      .delete()
+      .then(() => {
+        LoggerService.LogDebug(`Database successfully deleted`);
+      })
+      .catch((err) => {
+        LoggerService.LogWarn(`Could not delete database: `, err);
+      });
+  }
+
+  public ExportDataBase(progressCallback?: (progress: any) => boolean): Promise<Blob> {
+    return this.dexieDB.export({ progressCallback });
+  }
+
+  public ImportDataBase(
+    inFile: Blob,
+    progressCallback?: (progress: any) => boolean,
+  ): Promise<void> {
+    return this.dexieDB.import(inFile, { progressCallback });
   }
 }
 

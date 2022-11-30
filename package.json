@@ -19,8 +19,11 @@
     "node": "^14.18.0 || >=16.0.0"
   },
   "dependencies": {
+    "@types/downloadjs": "^1.4.3",
     "chokidar": "^3.5.3",
     "dexie": "^3.2.2",
+    "dexie-export-import": "^1.0.3",
+    "downloadjs": "^1.4.7",
     "eslint-import-resolver-typescript": "^3.5.2",
     "pinia": "^2.0.23",
     "regedit": "^5.1.1",

@@ -47,6 +47,13 @@
           to="/statistic"
         >
         </v-list-item>
+        <v-list-item
+          prepend-icon="mdi-file-arrow-left-right-outline"
+          title="Import/Export"
+          value="imexport"
+          to="/imexport"
+        >
+        </v-list-item>
       </v-list>
       <template v-slot:append>
         <div v-if="!rail" class="pa-2">
