@@ -187,7 +187,8 @@ class MissionProvider {
   }
 
   public ProcessNewMission(inMission: MissionModel): Promise<DexieMissionModel> {
-    return new Promise<DexieMissionModel>((resolve, reject) => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<DexieMissionModel>(async (resolve, reject) => {
       const savedPlayers: MissionPlayerModel[] = [];
       const notSavedPlayers: MissionPlayerModel[] = [];
       const dexieMission = new DexieMissionModel(inMission);
@@ -209,8 +210,18 @@ class MissionProvider {
       });
       dexieMission.Teams = orderedTeams;
 
-      dexieMission.Teams.forEach((missionTeam, teamIndex) =>
-        missionTeam.players.forEach(async (missionTeamPlayer) => {
+      for (let teamIndex = 0; teamIndex < dexieMission.Teams.length; teamIndex++) {
+        const missionTeam = dexieMission.Teams[teamIndex];
+        for (let playerIndex = 0; playerIndex < missionTeam.players.length; playerIndex++) {
+          const missionTeamPlayer = missionTeam.players[playerIndex];
+          // const playerkills = await this.processPlayer(
+          //   missionTeamPlayer,
+          //   inMission.MissionFinishedDateTime,
+          //   missionLog,
+          //   teamIndex,
+          // );
+          // dexieMission.missionKills.append(playerkills);
+
           await this.processPlayer(
             missionTeamPlayer,
             inMission.MissionFinishedDateTime,
@@ -225,8 +236,8 @@ class MissionProvider {
               LoggerService.debug(error);
               notSavedPlayers.push(missionTeamPlayer);
             });
-        }),
-      );
+        }
+      }
 
       missionLog.sort((lhs, rhs) => {
         if (lhs.eventTime.getTime() < rhs.eventTime.getTime()) {
