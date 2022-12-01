@@ -160,7 +160,7 @@ export default defineComponent({
     test2() {
       if (import.meta.env.DEV) {
         // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`) 3743e407-8d68-4aea-bd64-c5acffa9b80c
-        MissionService.FetchMissionByUuid('6cdfd306-7adf-494d-be1b-521e12af5976')
+        MissionService.FetchMissionByUuid('d4c17b6d-d262-4785-99d5-695e760fc128')
           .then((missionModel) => {
             const testinfo = missionModel.Teams.map((t) => t.players.map((p) => p.killedbyme));
             LoggerService.debug(`testinofo: `, testinfo);
