@@ -93,6 +93,7 @@
                     :rules="nameRules"
                     persistent-hint
                     required
+                    type="number"
                     @change="onProfileChanged"
                   ></v-text-field>
                 </v-col>

@@ -143,14 +143,16 @@ export default defineComponent({
     },
     test() {
       if (import.meta.env.DEV) {
-        // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`)
-        AttributesXmlService.ReadXmlFile(this.settings.huntAttriburesXmlPath)
+        AttributesXmlService.ReadXmlFile(`./src/mock/attributes_QP.xml`)
+          // AttributesXmlService.ReadXmlFile(this.settings.huntAttriburesXmlPath)
           .then(() => {
             const missionModel = AttributesXmlService.LastMissionLog;
-            MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
-              LoggerService.debug(`test mission processed: ${dexieMissionData}`);
-              this.dexieMissionData = dexieMissionData;
-            });
+            this.saveMissionDataToDB(missionModel);
+            // MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
+            //   LoggerService.debug(`test mission processed: ${dexieMissionData}`);
+            //   this.dexieMissionData = dexieMissionData;
+            //   this.saveMissionDataToDB(dexieMissionData)
+            // });
           })
           .catch((error) => {
             LoggerService.error(error);
