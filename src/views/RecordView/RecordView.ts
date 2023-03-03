@@ -176,5 +176,11 @@ export default defineComponent({
           });
       }
     },
+    timeDiffInMinutes(lhs: Date, rhs: Date): number {
+      const diffMs = rhs.getTime() - lhs.getTime(); // milliseconds between rhs and lhs
+      const diffMins = diffMs / 1000 / 60;
+      LoggerService.debug(`timeDiffInMinutes: ${diffMins}`);
+      return diffMins;
+    },
   },
 });

@@ -14,16 +14,16 @@ export interface IMissionPlayerTooltipsModel {
 }
 
 export class MissionPlayerTooltipsModel implements IMissionPlayerTooltipsModel {
-  public downedbyteammate?: IMissionPlayerTooltipModel[];
-  public tooltipbountyextracted?: IMissionPlayerTooltipModel[];
-  public tooltipbountypickedup?: IMissionPlayerTooltipModel[];
-  public tooltipdownedbyme?: IMissionPlayerTooltipModel[];
-  public tooltipdownedme?: IMissionPlayerTooltipModel[];
-  public tooltipdownedteammate?: IMissionPlayerTooltipModel[];
-  public tooltipkilledbyme?: IMissionPlayerTooltipModel[];
-  public tooltipkilledbyteammate?: IMissionPlayerTooltipModel[];
-  public tooltipkilledme?: IMissionPlayerTooltipModel[];
-  public tooltipkilledteammate?: IMissionPlayerTooltipModel[];
+  public downedbyteammate?: MissionPlayerTooltipModel[];
+  public tooltipbountyextracted?: MissionPlayerTooltipModel[];
+  public tooltipbountypickedup?: MissionPlayerTooltipModel[];
+  public tooltipdownedbyme?: MissionPlayerTooltipModel[];
+  public tooltipdownedme?: MissionPlayerTooltipModel[];
+  public tooltipdownedteammate?: MissionPlayerTooltipModel[];
+  public tooltipkilledbyme?: MissionPlayerTooltipModel[];
+  public tooltipkilledbyteammate?: MissionPlayerTooltipModel[];
+  public tooltipkilledme?: MissionPlayerTooltipModel[];
+  public tooltipkilledteammate?: MissionPlayerTooltipModel[];
 
   constructor();
   constructor(obj: IMissionPlayerTooltipsModel);
