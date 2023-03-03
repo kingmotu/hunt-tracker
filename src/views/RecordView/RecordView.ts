@@ -2,32 +2,24 @@ import { AttributesXmlService, MissionService } from '@/services';
 import { defineComponent, ref } from 'vue';
 import { ProfileService, LoggerService, SettingsService } from '@/services/index';
 import { MissionModel } from '@/models/Mission/MissionModel';
-import { MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { DexieSettingsModel } from '@/models/Dexie/DexieSettingsModel';
 import { DexieProfileModel } from '@/models/Dexie/DexieProfileModel';
 import { DexieMissionModel } from '@/models/Dexie/DexieMissionModel';
 
-import TeamCard from '@/components/TeamCard/TeamCard.vue';
-import MissonLog from '@/components/MissionLog/MissionLog.vue';
+import MissonOverview from '@/components/MissionOverview/MissionOverview.vue';
 
 export default defineComponent({
   name: 'RecordView',
   components: {
-    TeamCard,
-    MissonLog,
+    MissonOverview,
   },
   data: () => ({
     settings: ref<DexieSettingsModel>(),
     profile: ref<DexieProfileModel>(),
-    missionData: ref<MissionModel>(),
     dexieMissionData: ref<DexieMissionModel>(),
-    ownTeam: ref<MissionTeamModel>(),
-    teams: ref<MissionTeamModel[]>(),
     first: ref(true),
     isWatching: ref(false),
     isProcessing: ref(false),
-    tab: null,
-    huntProfileId: 0,
     develop: import.meta.env.DEV,
   }),
   created() {
@@ -45,6 +37,7 @@ export default defineComponent({
     //   .catch((error) => {
     //     LoggerService.error(error);
     //   });
+    this.dexieMissionData = new DexieMissionModel();
   },
   beforeMount() {
     this.setSettings(SettingsService.Settings);
@@ -94,10 +87,7 @@ export default defineComponent({
         this.isProcessing = true;
         MissionService.FetchMissionByUuid(MissionService.LastUsedMissionUuid)
           .then((missionData) => {
-            this.missionData = missionData;
             this.dexieMissionData = missionData;
-            this.ownTeam = missionData.Teams.find((team) => team.ownteam);
-            this.teams = missionData.Teams.filter((team) => !team.ownteam);
             if (this.profile) {
               this.first = (this.profile as DexieProfileModel).hasMissionInit;
             }
@@ -125,16 +115,20 @@ export default defineComponent({
       }
     },
     saveMissionDataToDB(inMissionModel: MissionModel, wasFirst: boolean = false) {
-      if (this.missionData && inMissionModel.compare(this.missionData) === true) {
-        LoggerService.warn(`Mission data seems to be the same: `, this.missionData, inMissionModel);
+      if (
+        this.dexieMissionData &&
+        inMissionModel.compare(this.dexieMissionData as MissionModel) === true
+      ) {
+        LoggerService.warn(
+          `Mission data seems to be the same: `,
+          this.dexieMissionData,
+          inMissionModel,
+        );
       } else {
         MissionService.AddNewMission(inMissionModel)
           .then((dexieMissionData) => {
             LoggerService.debug(`new mission processed and saved: ${dexieMissionData}`);
-            this.missionData = dexieMissionData;
             this.dexieMissionData = dexieMissionData;
-            this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
-            this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
             if (wasFirst) {
               this.first = false;
             }
@@ -155,10 +149,7 @@ export default defineComponent({
             const missionModel = AttributesXmlService.LastMissionLog;
             MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
               LoggerService.debug(`test mission processed: ${dexieMissionData}`);
-              this.missionData = dexieMissionData;
               this.dexieMissionData = dexieMissionData;
-              this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
-              this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
             });
           })
           .catch((error) => {
@@ -169,16 +160,13 @@ export default defineComponent({
     test2() {
       if (import.meta.env.DEV) {
         // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`) 3743e407-8d68-4aea-bd64-c5acffa9b80c
-        MissionService.FetchMissionByUuid('ddd76e88-4af4-4e20-b1ba-0a5211a08a54')
+        MissionService.FetchMissionByUuid('6cdfd306-7adf-494d-be1b-521e12af5976')
           .then((missionModel) => {
             const testinfo = missionModel.Teams.map((t) => t.players.map((p) => p.killedbyme));
             LoggerService.debug(`testinofo: `, testinfo);
             MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
               LoggerService.debug(`test mission processed: ${dexieMissionData}`);
-              this.missionData = dexieMissionData;
               this.dexieMissionData = dexieMissionData;
-              this.ownTeam = dexieMissionData.Teams.find((team) => team.ownteam);
-              this.teams = dexieMissionData.Teams.filter((team) => !team.ownteam);
             });
           })
           .catch((error) => {
