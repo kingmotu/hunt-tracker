@@ -114,8 +114,13 @@ export default defineComponent({
         this.saveMissionDataToDB(inMissionModel);
       }
     },
-    saveMissionDataToDB(inMissionModel: MissionModel, wasFirst: boolean = false) {
+    saveMissionDataToDB(
+      inMissionModel: MissionModel,
+      wasFirst: boolean = false,
+      force: boolean = false,
+    ) {
       if (
+        force === false &&
         this.dexieMissionData &&
         inMissionModel.compare(this.dexieMissionData as MissionModel) === true
       ) {
@@ -143,11 +148,11 @@ export default defineComponent({
     },
     test() {
       if (import.meta.env.DEV) {
-        AttributesXmlService.ReadXmlFile(`./src/mock/attributes_QP.xml`)
-          // AttributesXmlService.ReadXmlFile(this.settings.huntAttriburesXmlPath)
+        // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_QP.xml`)
+        AttributesXmlService.ReadXmlFile(this.settings.huntAttriburesXmlPath)
           .then(() => {
             const missionModel = AttributesXmlService.LastMissionLog;
-            this.saveMissionDataToDB(missionModel);
+            this.saveMissionDataToDB(missionModel, false, true);
             // MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
             //   LoggerService.debug(`test mission processed: ${dexieMissionData}`);
             //   this.dexieMissionData = dexieMissionData;

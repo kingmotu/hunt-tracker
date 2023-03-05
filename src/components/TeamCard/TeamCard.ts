@@ -62,15 +62,15 @@ export default defineComponent({
         ...(player.processedTooltips?.tooltipdownedbyme
           ? player.processedTooltips.tooltipdownedbyme
           : []),
-        ...(player.processedTooltips?.downedbyteammate
-          ? player.processedTooltips.downedbyteammate
+        ...(player.processedTooltips?.tooltip_downedbyteammate
+          ? player.processedTooltips.tooltip_downedbyteammate
           : []),
       ];
 
       tooltips.sort(this.sortByDate);
 
       const tooltipsString = tooltips
-        .map((t) => `${t.time} by ${t.text.includes('you') ? 'you' : 'teammate'}`)
+        .map((t) => `${t.time} by ${t.type === MissionLogTypeEnum.DownedByMe ? 'you' : 'teammate'}`)
         .join('<br />');
       return tooltipsString;
     },
@@ -88,7 +88,7 @@ export default defineComponent({
       tooltips.sort(this.sortByDate);
 
       const tooltipsString = tooltips
-        .map((t) => `${t.time} by ${t.text.includes('you') ? 'you' : 'teammate'}`)
+        .map((t) => `${t.time} by ${t.type === MissionLogTypeEnum.KilledByMe ? 'you' : 'teammate'}`)
         .join('<br />');
       return tooltipsString;
     },
