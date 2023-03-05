@@ -27,7 +27,7 @@ export default defineComponent({
     validProfile: true,
     settingsChanged: false,
     profileChanged: false,
-    huntProfileId: '',
+    huntProfileId: 0,
     settings: undefined,
     profile: undefined,
 
@@ -167,7 +167,7 @@ export default defineComponent({
             ? ProfileService.LastUsedProfileUuid
             : crypto.randomUUID(),
           steamUserId: SteamService.SteamActiveUserId,
-          huntProfileId: this.huntProfileId,
+          huntProfileId: parseInt(this.huntProfileId, 10),
           hasMissionInit: false,
         });
 

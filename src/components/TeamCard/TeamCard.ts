@@ -1,6 +1,8 @@
 import { IMissionTeamModel, MissionTeamModel } from '@/models/Mission/MissionTeamModel';
 import { defineComponent, PropType } from 'vue';
 import { MissionPlayerModel } from '@/models/Mission/MissionPlayerModel';
+import { MissionPlayerTooltipModel } from '@/models/Mission/MissionPlayerTooltipModel';
+import { MissionLogTypeEnum } from '@/enums/MissionLogTypeEnum';
 
 export default defineComponent({
   name: 'TeamCard',
@@ -31,11 +33,74 @@ export default defineComponent({
 
       return stars;
     },
+
     onPlayerClicked(player: MissionPlayerModel) {
       window.open(
         `https://steamcommunity.com/search/users/#text=${player.blood_line_name}`,
         '_blank',
       );
+    },
+
+    getPlayerDownedCount(player: MissionPlayerModel): string {
+      let downed = '-';
+      if (player.downedbyme > 0 || player.downedbyteammate > 0) {
+        downed = (player.downedbyme + player.downedbyteammate).toString();
+      }
+      return downed;
+    },
+
+    getPlayerKilledCount(player: MissionPlayerModel): string {
+      let downed = '-';
+      if (player.killedbyme > 0 || player.killedbyteammate > 0) {
+        downed = (player.killedbyme + player.killedbyteammate).toString();
+      }
+      return downed;
+    },
+
+    getPlayerDownedTooltip(player: MissionPlayerModel): string {
+      const tooltips = [
+        ...(player.processedTooltips?.tooltipdownedbyme
+          ? player.processedTooltips.tooltipdownedbyme
+          : []),
+        ...(player.processedTooltips?.tooltip_downedbyteammate
+          ? player.processedTooltips.tooltip_downedbyteammate
+          : []),
+      ];
+
+      tooltips.sort(this.sortByDate);
+
+      const tooltipsString = tooltips
+        .map((t) => `${t.time} by ${t.type === MissionLogTypeEnum.DownedByMe ? 'you' : 'teammate'}`)
+        .join('<br />');
+      return tooltipsString;
+    },
+
+    getPlayerKilledTooltip(player: MissionPlayerModel): string {
+      const tooltips = [
+        ...(player.processedTooltips?.tooltipkilledbyme
+          ? player.processedTooltips.tooltipkilledbyme
+          : []),
+        ...(player.processedTooltips?.tooltipkilledbyteammate
+          ? player.processedTooltips.tooltipkilledbyteammate
+          : []),
+      ];
+
+      tooltips.sort(this.sortByDate);
+
+      const tooltipsString = tooltips
+        .map((t) => `${t.time} by ${t.type === MissionLogTypeEnum.KilledByMe ? 'you' : 'teammate'}`)
+        .join('<br />');
+      return tooltipsString;
+    },
+
+    sortByDate(lhs: MissionPlayerTooltipModel, rhs: MissionPlayerTooltipModel): number {
+      if (lhs.dateTime.getTime() < rhs.dateTime.getTime()) {
+        return -1;
+      } else if (lhs.dateTime.getTime() > rhs.dateTime.getTime()) {
+        return 1;
+      } else {
+        return 0;
+      }
     },
   },
 });

@@ -1,3 +1,5 @@
+import { MissionPlayerTooltipsModel } from '@/models/Mission/MissionPlayerTooltipsModel';
+
 export interface IMissionPlayerModel {
   /**
    * Internal team player id for mission
@@ -95,7 +97,7 @@ export interface IMissionPlayerModel {
    */
   teamextraction: boolean;
   /**
-   * ?
+   * Tooltips
    */
   tooltip_downedbyteammate: string;
   tooltipbountyextracted: string;
@@ -107,6 +109,10 @@ export interface IMissionPlayerModel {
   tooltipkilledbyteammate: string;
   tooltipkilledme: string;
   tooltipkilledteammate: string;
+  /**
+   * Processed tooltips for better internal use
+   */
+  processedTooltips?: MissionPlayerTooltipsModel;
 }
 
 export class MissionPlayerModel implements IMissionPlayerModel {
@@ -143,6 +149,8 @@ export class MissionPlayerModel implements IMissionPlayerModel {
   public tooltipkilledbyteammate: string;
   public tooltipkilledme: string;
   public tooltipkilledteammate: string;
+
+  public processedTooltips?: MissionPlayerTooltipsModel;
 
   constructor();
   constructor(obj: IMissionPlayerModel);
@@ -181,5 +189,7 @@ export class MissionPlayerModel implements IMissionPlayerModel {
     this.tooltipkilledbyteammate = (obj && obj.tooltipkilledbyteammate) || '';
     this.tooltipkilledme = (obj && obj.tooltipkilledme) || '';
     this.tooltipkilledteammate = (obj && obj.tooltipkilledteammate) || '';
+
+    this.processedTooltips = obj && obj.processedTooltips ? obj.processedTooltips : undefined;
   }
 }
