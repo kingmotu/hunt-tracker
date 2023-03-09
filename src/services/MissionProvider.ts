@@ -279,26 +279,28 @@ class MissionProvider {
     inTeamIndex: number,
   ): Promise<MissionPlayerKillsModel> {
     return new Promise<MissionPlayerKillsModel>((resolve, reject) => {
-      const playerTooltips = this.processPlayerTooltips(inMissionPlayer, missionDate);
-      for (const key in playerTooltips) {
-        if (Object.prototype.hasOwnProperty.call(playerTooltips, key)) {
-          const tooltips = playerTooltips[key] as MissionPlayerTooltipModel[] | undefined;
-          if (tooltips) {
-            tooltips.forEach((tooltip) => {
-              inMissionLog.push(
-                new MissionLogModel({
-                  playerTeamId: inTeamIndex,
-                  playerProfileId: inMissionPlayer.profileid,
-                  playerProfileName: inMissionPlayer.blood_line_name,
-                  text: tooltip.text,
-                  additionalText: tooltip.additionalText,
-                  eventTime: tooltip.dateTime,
-                  eventTimeString: tooltip.time.length <= 4 ? `0${tooltip.time}` : tooltip.time,
-                  type: tooltip.type,
-                  wasTeammate: tooltip.wasTeammate,
-                }),
-              );
-            });
+      inMissionPlayer.processedTooltips = this.processPlayerTooltips(inMissionPlayer, missionDate);
+      if (inMissionPlayer.processedTooltips) {
+        for (const key in inMissionPlayer.processedTooltips) {
+          if (Object.prototype.hasOwnProperty.call(inMissionPlayer.processedTooltips, key)) {
+            const tooltips = inMissionPlayer.processedTooltips[key] as MissionPlayerTooltipModel[];
+            if (tooltips) {
+              tooltips.forEach((tooltip) => {
+                inMissionLog.push(
+                  new MissionLogModel({
+                    playerTeamId: inTeamIndex,
+                    playerProfileId: inMissionPlayer.profileid,
+                    playerProfileName: inMissionPlayer.blood_line_name,
+                    text: tooltip.text,
+                    additionalText: tooltip.additionalText,
+                    eventTime: tooltip.dateTime,
+                    eventTimeString: tooltip.time.length <= 4 ? `0${tooltip.time}` : tooltip.time,
+                    type: tooltip.type,
+                    wasTeammate: tooltip.wasTeammate,
+                  }),
+                );
+              });
+            }
           }
         }
       }
@@ -442,47 +444,30 @@ class MissionProvider {
       return dateTime;
     };
     try {
-      if (key === 'tooltipbountyextracted') {
-        for (let index = 0; index < parts.length; index += 2) {
-          if (parts[index].includes('extracted')) {
-            tooltips.push(
-              new MissionPlayerTooltipModel({
-                additionalText: '',
-                text: parts[index],
-                time: parts[index + 1],
-                dateTime: getTimes(parts[index + 1]),
-                wasTeammate: key.includes('team'),
-                type: this.getTooltipType(key),
-              }),
-            );
-          }
+      let startIndex = 0;
+      /**
+       * downed/kill tooltips contain infos we can skip
+       */
+      if (key !== 'tooltipbountyextracted' && key !== 'tooltipbountypickedup') {
+        startIndex = 2;
+      }
+      for (let index = startIndex; index < parts.length; index += 2) {
+        if (key === 'tooltipbountyextracted' && parts[index].includes('extracted') === false) {
+          /**
+           * for tooltipbountyextracted we only want to add the parts that contain extracted
+           */
+          continue;
         }
-      } else if (key === 'tooltipbountypickedup') {
-        for (let index = 0; index < parts.length; index += 2) {
-          tooltips.push(
-            new MissionPlayerTooltipModel({
-              additionalText: '',
-              text: parts[index],
-              time: parts[index + 1],
-              dateTime: getTimes(parts[index + 1]),
-              wasTeammate: key.includes('team'),
-              type: this.getTooltipType(key),
-            }),
-          );
-        }
-      } else {
-        for (let index = 0; index < parts.length; index += 4) {
-          tooltips.push(
-            new MissionPlayerTooltipModel({
-              additionalText: parts[index],
-              text: parts[index + 2],
-              time: parts[index + 3],
-              dateTime: getTimes(parts[index + 3]),
-              wasTeammate: key.includes('team'),
-              type: this.getTooltipType(key),
-            }),
-          );
-        }
+        tooltips.push(
+          new MissionPlayerTooltipModel({
+            additionalText: '',
+            text: parts[index],
+            time: parts[index + 1],
+            dateTime: getTimes(parts[index + 1]),
+            wasTeammate: key.includes('team'),
+            type: this.getTooltipType(key),
+          }),
+        );
       }
     } catch (error) {
       LoggerService.error(`Error on parse tooltip: `, error);
