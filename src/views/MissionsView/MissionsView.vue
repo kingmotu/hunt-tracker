@@ -1,7 +1,40 @@
 <template>
   <div class="mission-view">
     mission view
-
+    <v-row class="pa-3">
+      <v-col cols="3">
+        <v-btn
+          :color="missionFilter === missionFilterEnum.All ? 'secondary' : ''"
+          @click="getFilteredMissions(missionFilterEnum.All)"
+        >
+          All
+        </v-btn>
+      </v-col>
+      <v-col cols="3">
+        <v-btn
+          :color="missionFilter === missionFilterEnum.Today ? 'secondary' : ''"
+          @click="getFilteredMissions(missionFilterEnum.Today)"
+        >
+          Today
+        </v-btn>
+      </v-col>
+      <v-col cols="3">
+        <v-btn
+          :color="missionFilter === missionFilterEnum.Week ? 'secondary' : ''"
+          @click="getFilteredMissions(missionFilterEnum.Week)"
+        >
+          Week
+        </v-btn>
+      </v-col>
+      <v-col cols="3">
+        <v-btn
+          :color="missionFilter === missionFilterEnum.Month ? 'secondary' : ''"
+          @click="getFilteredMissions(missionFilterEnum.Month)"
+        >
+          Month
+        </v-btn>
+      </v-col>
+    </v-row>
     <v-table fixed-header height="85vh" :hover="true">
       <thead>
         <tr>
@@ -13,7 +46,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in missions" :key="item.uuid" @click="onMissionClicked(item)">
+        <tr v-for="item in selectedMissions" :key="item.uuid" @click="onMissionClicked(item)">
           <td>{{ item.MissionFinishedDateTime.toLocaleString() }}</td>
           <td>{{ getMode(item) }}</td>
           <td>
