@@ -1,7 +1,7 @@
 import { IMissionPlayerTooltipModel, MissionPlayerTooltipModel } from './MissionPlayerTooltipModel';
 
 export interface IMissionPlayerTooltipsModel {
-  downedbyteammate?: IMissionPlayerTooltipModel[];
+  tooltip_downedbyteammate?: IMissionPlayerTooltipModel[];
   tooltipbountyextracted?: IMissionPlayerTooltipModel[];
   tooltipbountypickedup?: IMissionPlayerTooltipModel[];
   tooltipdownedbyme?: IMissionPlayerTooltipModel[];
@@ -14,25 +14,25 @@ export interface IMissionPlayerTooltipsModel {
 }
 
 export class MissionPlayerTooltipsModel implements IMissionPlayerTooltipsModel {
-  public downedbyteammate?: IMissionPlayerTooltipModel[];
-  public tooltipbountyextracted?: IMissionPlayerTooltipModel[];
-  public tooltipbountypickedup?: IMissionPlayerTooltipModel[];
-  public tooltipdownedbyme?: IMissionPlayerTooltipModel[];
-  public tooltipdownedme?: IMissionPlayerTooltipModel[];
-  public tooltipdownedteammate?: IMissionPlayerTooltipModel[];
-  public tooltipkilledbyme?: IMissionPlayerTooltipModel[];
-  public tooltipkilledbyteammate?: IMissionPlayerTooltipModel[];
-  public tooltipkilledme?: IMissionPlayerTooltipModel[];
-  public tooltipkilledteammate?: IMissionPlayerTooltipModel[];
+  public tooltip_downedbyteammate?: MissionPlayerTooltipModel[];
+  public tooltipbountyextracted?: MissionPlayerTooltipModel[];
+  public tooltipbountypickedup?: MissionPlayerTooltipModel[];
+  public tooltipdownedbyme?: MissionPlayerTooltipModel[];
+  public tooltipdownedme?: MissionPlayerTooltipModel[];
+  public tooltipdownedteammate?: MissionPlayerTooltipModel[];
+  public tooltipkilledbyme?: MissionPlayerTooltipModel[];
+  public tooltipkilledbyteammate?: MissionPlayerTooltipModel[];
+  public tooltipkilledme?: MissionPlayerTooltipModel[];
+  public tooltipkilledteammate?: MissionPlayerTooltipModel[];
 
   constructor();
   constructor(obj: IMissionPlayerTooltipsModel);
   constructor(obj?: any) {
     if (obj) {
-      if (obj.downedbyteammate) {
-        this.downedbyteammate = [];
-        obj.downedbyteammate.forEach((item) => {
-          this.downedbyteammate.push(new MissionPlayerTooltipModel(item));
+      if (obj.tooltip_downedbyteammate) {
+        this.tooltip_downedbyteammate = [];
+        obj.tooltip_downedbyteammate.forEach((item) => {
+          this.tooltip_downedbyteammate.push(new MissionPlayerTooltipModel(item));
         });
       }
       if (obj.tooltipbountyextracted) {

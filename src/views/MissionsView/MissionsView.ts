@@ -5,6 +5,7 @@ import { defineComponent, ref } from 'vue';
 import { RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
 
 import MissonOverview from '@/components/MissionOverview/MissionOverview.vue';
+import { MissionFilterEnum } from '@/enums/MissionFilterEnum';
 
 export default defineComponent({
   name: 'MissionsView',
@@ -13,21 +14,26 @@ export default defineComponent({
   },
   data: () => ({
     missions: ref<DexieMissionModel[]>(),
+    selectedMissions: ref<DexieMissionModel[]>(),
     profile: ref<DexieProfileModel>(),
     route: useRoute(),
     missionUuid: '',
     missionData: ref<DexieMissionModel>(),
     showMission: false,
+    missionFilter: ref<MissionFilterEnum>(),
+    missionFilterEnum: MissionFilterEnum,
   }),
   created() {
     this.missionData = new DexieMissionModel();
+    this.missionFilter = MissionFilterEnum.Week;
   },
   beforeMount() {
     this.setProfile(ProfileService.UserProfile);
     ProfileService.OnProfileChanged.on(this.setProfile);
     MissionService.FetchMissions()
       .then((missions) => {
-        this.missions = missions;
+        this.missions = missions.reverse();
+        this.getFilteredMissions();
       })
       .catch((error) => {
         LoggerService.error(error);
@@ -53,6 +59,40 @@ export default defineComponent({
       if (profile) {
         this.profile = profile;
         this.huntProfileId = profile.huntProfileId;
+      }
+    },
+    getFilteredMissions(inFilter: MissionFilterEnum = MissionFilterEnum.All): void {
+      const today = new Date();
+      this.missionFilter = inFilter;
+      switch (inFilter) {
+        case MissionFilterEnum.Today:
+          this.selectedMissions = this.missions.filter(
+            (m: DexieMissionModel) =>
+              m.MissionFinishedDateTime.getFullYear() === today.getFullYear() &&
+              m.MissionFinishedDateTime.getMonth() === today.getMonth() &&
+              m.MissionFinishedDateTime.getDate() === today.getDate(),
+          );
+          break;
+        case MissionFilterEnum.Week:
+          this.selectedMissions = this.missions.filter(
+            (m: DexieMissionModel) =>
+              m.MissionFinishedDateTime.getFullYear() === today.getFullYear() &&
+              m.MissionFinishedDateTime.getMonth() === today.getMonth() &&
+              m.MissionFinishedDateTime.getDate() >= today.getDate() - 6 &&
+              m.MissionFinishedDateTime.getDate() <= today.getDate(),
+          );
+          break;
+        case MissionFilterEnum.Month:
+          this.selectedMissions = this.missions.filter(
+            (m: DexieMissionModel) =>
+              m.MissionFinishedDateTime.getFullYear() === today.getFullYear() &&
+              m.MissionFinishedDateTime.getMonth() === today.getMonth(),
+          );
+          break;
+
+        default:
+          this.selectedMissions = this.missions;
+          break;
       }
     },
     getMode(inMission: DexieMissionModel): string {

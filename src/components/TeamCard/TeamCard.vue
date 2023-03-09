@@ -23,6 +23,12 @@
         <v-col cols="2">
           <div class="mmr text-body-2">({{ team.mmr }})</div>
         </v-col>
+        <v-col cols="1" class="ml-n1">
+          <div class="mmr text-body-2" title="Downed">D</div>
+        </v-col>
+        <v-col cols="1" class="ml-n1">
+          <div class="mmr text-body-2" title="Killed">K</div>
+        </v-col>
       </v-row>
     </template>
 
@@ -51,7 +57,7 @@
         >
           <v-list-item-title>
             <v-row no-gutters>
-              <v-col cols="5">
+              <v-col cols="3">
                 <div
                   class="player-name text-body-1 pr-2"
                   :class="{
@@ -74,6 +80,32 @@
               </v-col>
               <v-col cols="2">
                 <div class="mmr text-body-2">({{ player.mmr }})</div>
+              </v-col>
+              <v-col cols="1">
+                <div class="mmr text-body-2">
+                  {{ getPlayerDownedCount(player) }}
+                  <v-tooltip
+                    v-if="getPlayerDownedCount(player) !== '-'"
+                    activator="parent"
+                    location="top"
+                    origin="auto"
+                  >
+                    <span v-html="getPlayerDownedTooltip(player)"></span>
+                  </v-tooltip>
+                </div>
+              </v-col>
+              <v-col cols="1">
+                <div class="mmr text-body-2">
+                  {{ getPlayerKilledCount(player) }}
+                  <v-tooltip
+                    v-if="getPlayerKilledCount(player) !== '-'"
+                    activator="parent"
+                    location="top"
+                    origin="auto"
+                  >
+                    <span v-html="getPlayerKilledTooltip(player)"></span>
+                  </v-tooltip>
+                </div>
               </v-col>
             </v-row>
           </v-list-item-title>

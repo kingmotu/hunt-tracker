@@ -114,8 +114,13 @@ export default defineComponent({
         this.saveMissionDataToDB(inMissionModel);
       }
     },
-    saveMissionDataToDB(inMissionModel: MissionModel, wasFirst: boolean = false) {
+    saveMissionDataToDB(
+      inMissionModel: MissionModel,
+      wasFirst: boolean = false,
+      force: boolean = false,
+    ) {
       if (
+        force === false &&
         this.dexieMissionData &&
         inMissionModel.compare(this.dexieMissionData as MissionModel) === true
       ) {
@@ -143,14 +148,16 @@ export default defineComponent({
     },
     test() {
       if (import.meta.env.DEV) {
-        // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`)
+        // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_QP.xml`)
         AttributesXmlService.ReadXmlFile(this.settings.huntAttriburesXmlPath)
           .then(() => {
             const missionModel = AttributesXmlService.LastMissionLog;
-            MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
-              LoggerService.debug(`test mission processed: ${dexieMissionData}`);
-              this.dexieMissionData = dexieMissionData;
-            });
+            this.saveMissionDataToDB(missionModel, false, true);
+            // MissionService.ProcessNewMission(missionModel).then((dexieMissionData) => {
+            //   LoggerService.debug(`test mission processed: ${dexieMissionData}`);
+            //   this.dexieMissionData = dexieMissionData;
+            //   this.saveMissionDataToDB(dexieMissionData)
+            // });
           })
           .catch((error) => {
             LoggerService.error(error);
@@ -160,7 +167,7 @@ export default defineComponent({
     test2() {
       if (import.meta.env.DEV) {
         // AttributesXmlService.ReadXmlFile(`./src/mock/attributes_BH_Solo.xml`) 3743e407-8d68-4aea-bd64-c5acffa9b80c
-        MissionService.FetchMissionByUuid('6cdfd306-7adf-494d-be1b-521e12af5976')
+        MissionService.FetchMissionByUuid('d4c17b6d-d262-4785-99d5-695e760fc128')
           .then((missionModel) => {
             const testinfo = missionModel.Teams.map((t) => t.players.map((p) => p.killedbyme));
             LoggerService.debug(`testinofo: `, testinfo);
@@ -173,6 +180,12 @@ export default defineComponent({
             LoggerService.error(error);
           });
       }
+    },
+    timeDiffInMinutes(lhs: Date, rhs: Date): number {
+      const diffMs = rhs.getTime() - lhs.getTime(); // milliseconds between rhs and lhs
+      const diffMins = diffMs / 1000 / 60;
+      LoggerService.debug(`timeDiffInMinutes: ${diffMins}`);
+      return diffMins;
     },
   },
 });
